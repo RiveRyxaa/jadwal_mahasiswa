@@ -59,7 +59,15 @@ class _TambahJadwalScreenState extends State<TambahJadwalScreen> {
 
   Future<void> _pickTime(bool isStart) async {
     final picked = await showTimePicker(context: context, initialTime: isStart ? _jamMulai : _jamSelesai);
-    if (picked != null) setState(() { if (isStart) _jamMulai = picked; else _jamSelesai = picked; });
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          _jamMulai = picked;
+        } else {
+          _jamSelesai = picked;
+        }
+      });
+    }
   }
 
   Future<void> _save() async {
@@ -117,7 +125,7 @@ class _TambahJadwalScreenState extends State<TambahJadwalScreen> {
               Text('Hari', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: _selectedHari,
+                initialValue: _selectedHari,
                 items: JadwalModel.hariList.map((h) => DropdownMenuItem(value: h, child: Text(h))).toList(),
                 onChanged: (v) => setState(() => _selectedHari = v!),
                 decoration: const InputDecoration(prefixIcon: Icon(Icons.calendar_today, size: 20)),

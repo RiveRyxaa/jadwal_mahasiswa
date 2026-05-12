@@ -301,7 +301,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
                         // Generate a course code from matkul name
                         final codeWords = jadwal.namaMatkul.split(' ');
                         final codePrefix = codeWords.length >= 2
-                            ? '${codeWords[0].substring(0, (codeWords[0].length).clamp(0, 4)).toUpperCase()}'
+                            ? codeWords[0].substring(0, (codeWords[0].length).clamp(0, 4)).toUpperCase()
                             : jadwal.namaMatkul.substring(0, jadwal.namaMatkul.length.clamp(0, 4)).toUpperCase();
                         final codeNum = (jadwal.id.hashCode % 900 + 100).abs().toString();
 

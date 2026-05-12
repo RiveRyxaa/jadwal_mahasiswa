@@ -54,8 +54,6 @@ class _CountdownWidgetState extends State<CountdownWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     if (widget.nextClass == null) {
       return Container(
         width: double.infinity,

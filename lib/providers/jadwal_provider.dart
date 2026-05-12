@@ -127,7 +127,6 @@ class JadwalProvider extends ChangeNotifier {
     if (next == null) return null;
 
     final now = DateTime.now();
-    const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
     final todayIndex = now.weekday - 1;
     final nextDayIndex = next.hariIndex;
 

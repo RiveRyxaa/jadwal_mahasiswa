@@ -16,7 +16,6 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   Timer? _timer;
-  Duration _countdown = Duration.zero;
 
   @override
   void initState() {
@@ -44,12 +43,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final todayJadwal = jadwalProv.jadwalHariIni;
     final now = DateTime.now();
     final currentMin = now.hour * 60 + now.minute;
-    final todayName = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'][now.weekday - 1];
 
     // Tasks stats
     final totalTugas = tugasProv.tugasList.length;
     final selesai = tugasProv.tugasSelesai.length;
-    final urgent = tugasProv.tugasOverdue.length + tugasProv.tugasAktif.where((t) => t.prioritas == Prioritas.tinggi).length;
 
     return Scaffold(
       body: SafeArea(
@@ -70,7 +67,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Row(children: [
                 Expanded(child: _StatCard(
                   icon: Icons.menu_book_rounded,
-                  value: totalTugas > 0 ? '${((selesai / totalTugas) * 4).toStringAsFixed(2)}' : '0.00',
+                  value: totalTugas > 0 ? ((selesai / totalTugas) * 4).toStringAsFixed(2) : '0.00',
                   label: 'Cum. GPA • ${DateFormat('yyyy').format(now)}',
                   badge: 'ACADEMIC AVG',
                   isDark: isDark,

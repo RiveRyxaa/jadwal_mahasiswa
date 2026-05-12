@@ -84,7 +84,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
             _SettingsTile(
               icon: isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
               title: isDark ? 'Light Mode' : 'Dark Mode',
-              trailing: Switch(value: themeProv.isDarkMode, onChanged: (_) => themeProv.toggleTheme(), activeColor: AppColors.primaryPurple),
+              trailing: Switch(value: themeProv.isDarkMode, onChanged: (_) => themeProv.toggleTheme(), activeTrackColor: AppColors.primaryPurple),
               onTap: () => themeProv.toggleTheme(),
             ),
             const SizedBox(height: 8),
@@ -120,8 +120,9 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     Expanded(child: CustomButton(text: 'Batal', isOutlined: true, onPressed: () => setState(() => _isEditingProfile = false))),
                     const SizedBox(width: 12),
                     Expanded(child: CustomButton(text: 'Simpan', onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
                       final ok = await auth.updateProfile(nama: _namaController.text.trim(), universitas: _univController.text.trim(), jurusan: _jurusanController.text.trim());
-                      if (ok && mounted) { setState(() => _isEditingProfile = false); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Profil berhasil diupdate'), backgroundColor: AppColors.success, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))); }
+                      if (ok && mounted) { setState(() => _isEditingProfile = false); messenger.showSnackBar(SnackBar(content: const Text('Profil berhasil diupdate'), backgroundColor: AppColors.success, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))); }
                     })),
                   ]),
                 ]),
@@ -147,10 +148,11 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     Expanded(child: CustomButton(text: 'Batal', isOutlined: true, onPressed: () => setState(() => _isChangingPassword = false))),
                     const SizedBox(width: 12),
                     Expanded(child: CustomButton(text: 'Simpan', onPressed: () async {
-                      if (_newPassController.text.length < 6) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Password minimal 6 karakter'), backgroundColor: AppColors.error, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))); return; }
+                      final messenger = ScaffoldMessenger.of(context);
+                      if (_newPassController.text.length < 6) { messenger.showSnackBar(SnackBar(content: const Text('Password minimal 6 karakter'), backgroundColor: AppColors.error, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))); return; }
                       final ok = await auth.changePassword(oldPassword: _oldPassController.text, newPassword: _newPassController.text);
-                      if (ok && mounted) { setState(() => _isChangingPassword = false); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Password berhasil diubah'), backgroundColor: AppColors.success, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))); }
-                      else if (mounted && auth.error != null) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(auth.error!), backgroundColor: AppColors.error, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))); }
+                      if (ok && mounted) { setState(() => _isChangingPassword = false); messenger.showSnackBar(SnackBar(content: const Text('Password berhasil diubah'), backgroundColor: AppColors.success, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))); }
+                      else if (mounted && auth.error != null) { messenger.showSnackBar(SnackBar(content: Text(auth.error!), backgroundColor: AppColors.error, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))); }
                     })),
                   ]),
                 ]),

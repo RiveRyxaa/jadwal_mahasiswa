@@ -76,26 +76,27 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _initApp() async {
+    final nav = Navigator.of(context);
     final themeProv = context.read<ThemeProvider>();
-    await themeProv.loadTheme();
-
+    final jadwalProv = context.read<JadwalProvider>();
+    final tugasProv = context.read<TugasProvider>();
     final authProv = context.read<AuthProvider>();
+
+    await themeProv.loadTheme();
     final loggedIn = await authProv.tryAutoLogin();
 
     if (loggedIn && mounted) {
       final userId = authProv.currentUser!.id;
       await Future.wait([
-        context.read<JadwalProvider>().loadJadwal(userId),
-        context.read<TugasProvider>().loadTugas(userId),
+        jadwalProv.loadJadwal(userId),
+        tugasProv.loadTugas(userId),
       ]);
     }
 
     await Future.delayed(const Duration(milliseconds: 1500));
 
     if (mounted) {
-      Navigator.of(context).pushReplacementNamed(
-        loggedIn ? '/home' : '/login',
-      );
+      nav.pushReplacementNamed(loggedIn ? '/home' : '/login');
     }
   }
 
