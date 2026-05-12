@@ -1,16 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 import '../../config/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/jadwal_provider.dart';
 import '../../providers/tugas_provider.dart';
-import '../../widgets/countdown_widget.dart';
-import '../../widgets/jadwal_card.dart';
-import '../../widgets/tugas_card.dart';
+import '../../models/tugas_model.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  Timer? _timer;
+  Duration _countdown = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,83 +39,146 @@ class DashboardScreen extends StatelessWidget {
     final jadwalProv = context.watch<JadwalProvider>();
     final tugasProv = context.watch<TugasProvider>();
     final user = auth.currentUser;
+    final nextClass = jadwalProv.kelasBerikutnya;
+    final timeUntil = jadwalProv.waktuMenujuKelasBerikutnya;
+    final todayJadwal = jadwalProv.jadwalHariIni;
     final now = DateTime.now();
-    final greeting = now.hour < 12 ? 'Selamat Pagi' : now.hour < 17 ? 'Selamat Siang' : 'Selamat Malam';
+    final currentMin = now.hour * 60 + now.minute;
+    final todayName = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'][now.weekday - 1];
+
+    // Tasks stats
+    final totalTugas = tugasProv.tugasList.length;
+    final selesai = tugasProv.tugasSelesai.length;
+    final urgent = tugasProv.tugasOverdue.length + tugasProv.tugasAktif.where((t) => t.prioritas == Prioritas.tinggi).length;
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('$greeting 👋', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
-                        const SizedBox(height: 4),
-                        Text(user?.nama ?? 'Mahasiswa', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 48, height: 48,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [AppColors.primaryPurple, AppColors.primaryPurpleDark]),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(child: Text(user?.nama.isNotEmpty == true ? user!.nama[0].toUpperCase() : 'M', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold))),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(DateFormat('EEEE, dd MMMM yyyy').format(now), style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
+              // ── Top Bar ──
+              _TopBar(user: user, isDark: isDark),
               const SizedBox(height: 24),
 
-              // Countdown Widget
-              CountdownWidget(nextClass: jadwalProv.kelasBerikutnya, timeUntil: jadwalProv.waktuMenujuKelasBerikutnya),
-              const SizedBox(height: 24),
+              // ── Next Class Card ──
+              _NextClassCard(nextClass: nextClass, timeUntil: timeUntil),
+              const SizedBox(height: 16),
 
-              // Quick Stats
-              Row(
-                children: [
-                  _StatCard(icon: Icons.calendar_today_rounded, label: 'Jadwal Hari Ini', value: '${jadwalProv.jadwalHariIni.length}', color: AppColors.primaryPurple, isDark: isDark),
-                  const SizedBox(width: 12),
-                  _StatCard(icon: Icons.assignment_outlined, label: 'Tugas Aktif', value: '${tugasProv.tugasAktif.length}', color: AppColors.warning, isDark: isDark),
-                  const SizedBox(width: 12),
-                  _StatCard(icon: Icons.warning_amber_rounded, label: 'Overdue', value: '${tugasProv.tugasOverdue.length}', color: AppColors.error, isDark: isDark),
-                ],
-              ),
+              // ── Stats Row ──
+              Row(children: [
+                Expanded(child: _StatCard(
+                  icon: Icons.menu_book_rounded,
+                  value: totalTugas > 0 ? '${((selesai / totalTugas) * 4).toStringAsFixed(2)}' : '0.00',
+                  label: 'Cum. GPA • ${DateFormat('yyyy').format(now)}',
+                  badge: 'ACADEMIC AVG',
+                  isDark: isDark,
+                )),
+                const SizedBox(width: 12),
+                Expanded(child: _StatCard(
+                  icon: Icons.check_circle_outline,
+                  value: '$selesai/$totalTugas',
+                  label: '',
+                  badge: 'TASKS DONE',
+                  isDark: isDark,
+                )),
+              ]),
               const SizedBox(height: 28),
 
-              // Today's Schedule
-              _SectionHeader(title: 'Jadwal Hari Ini', icon: Icons.calendar_today_rounded),
-              const SizedBox(height: 12),
-              if (jadwalProv.jadwalHariIni.isEmpty)
-                _EmptyState(message: 'Tidak ada jadwal hari ini', icon: Icons.event_available)
+              // ── Today's Schedule ──
+              Row(children: [
+                Text("Today's Schedule", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                const Spacer(),
+                Text('View All', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
+              ]),
+              const SizedBox(height: 14),
+              if (todayJadwal.isEmpty)
+                _EmptyBox(text: 'No classes today', icon: Icons.event_available, isDark: isDark)
               else
-                ...jadwalProv.jadwalHariIni.map((j) => JadwalCard(jadwal: j, isCompact: true)),
+                ...todayJadwal.map((j) {
+                  final sp = j.jamMulai.split(':');
+                  final hour = int.parse(sp[0]);
+                  final ampm = hour >= 12 ? 'PM' : 'AM';
+                  final h12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+                  final timeStr = '${h12.toString().padLeft(2,'0')}:${sp[1]}';
+                  final startMin = int.parse(sp[0]) * 60 + int.parse(sp[1]);
+                  final ep = j.jamSelesai.split(':');
+                  final endMin = int.parse(ep[0]) * 60 + int.parse(ep[1]);
+                  final isLive = currentMin >= startMin && currentMin < endMin;
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isLive ? AppColors.primaryPurple : (isDark ? AppColors.darkCard : AppColors.white),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: isLive ? AppColors.primaryPurple : (isDark ? AppColors.darkBorder : AppColors.divider)),
+                    ),
+                    child: Row(children: [
+                      // Time pill
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isLive ? Colors.white.withValues(alpha: 0.2) : (isDark ? AppColors.darkSurface : AppColors.primaryPurpleVeryLight),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(children: [
+                          Text(timeStr, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: isLive ? Colors.white : AppColors.primaryPurple)),
+                          Text(ampm, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: isLive ? Colors.white.withValues(alpha: 0.7) : AppColors.primaryPurple.withValues(alpha: 0.6))),
+                        ]),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(j.namaMatkul, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: isLive ? Colors.white : null)),
+                        Text('Lec. ${j.ruangan} • ${j.namaDosen}', style: TextStyle(fontSize: 11, color: isLive ? Colors.white.withValues(alpha: 0.7) : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary))),
+                      ])),
+                      if (isLive) Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6)),
+                        child: const Text('LIVE', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                      ),
+                    ]),
+                  );
+                }),
 
               const SizedBox(height: 24),
 
-              // Upcoming Deadlines
-              _SectionHeader(title: 'Deadline Terdekat', icon: Icons.access_alarm_rounded),
-              const SizedBox(height: 12),
+              // ── Upcoming Tasks ──
+              Row(children: [
+                Text('Upcoming Tasks', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                const Spacer(),
+                Container(
+                  width: 28, height: 28,
+                  decoration: BoxDecoration(color: AppColors.primaryPurple, borderRadius: BorderRadius.circular(8)),
+                  child: const Icon(Icons.add, color: Colors.white, size: 16),
+                ),
+              ]),
+              const SizedBox(height: 14),
               if (tugasProv.tugasDeadlineTerdekat.isEmpty)
-                _EmptyState(message: 'Tidak ada tugas aktif', icon: Icons.task_alt)
+                _EmptyBox(text: 'No upcoming tasks', icon: Icons.task_alt, isDark: isDark)
               else
-                ...tugasProv.tugasDeadlineTerdekat.take(3).map((t) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: TugasCard(
-                    tugas: t,
-                    onToggle: () => tugasProv.toggleStatus(user!.id, t.id),
+                ...tugasProv.tugasDeadlineTerdekat.take(3).map((t) => _TaskItem(tugas: t, isDark: isDark)),
+
+              // More tasks hint
+              if (tugasProv.tugasAktif.length > 3) ...[
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkCard : AppColors.primaryPurpleVeryLight.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
                   ),
-                )),
-              const SizedBox(height: 20),
+                  child: Column(children: [
+                    Text('You have ${tugasProv.tugasAktif.length - 3} more tasks later this month.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary), textAlign: TextAlign.center),
+                    const SizedBox(height: 6),
+                    Text('View full roadmap', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
+                  ]),
+                ),
+              ],
             ],
           ),
         ),
@@ -104,72 +187,236 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  const _SectionHeader({required this.title, required this.icon});
+// ── Top Bar ──
+class _TopBar extends StatelessWidget {
+  final dynamic user;
+  final bool isDark;
+  const _TopBar({required this.user, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      Icon(icon, size: 20, color: AppColors.primaryPurple),
-      const SizedBox(width: 8),
-      Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+      Container(
+        width: 36, height: 36,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [AppColors.primaryPurple, AppColors.primaryPurpleDark]),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(child: Text(
+          user?.nama?.isNotEmpty == true ? user!.nama[0].toUpperCase() : 'M',
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+        )),
+      ),
+      const SizedBox(width: 10),
+      Text('CampusFlow', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryPurple, fontWeight: FontWeight.bold)),
+      const Spacer(),
+      Container(
+        width: 40, height: 40,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : AppColors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+        ),
+        child: Icon(Icons.notifications_none_rounded, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary, size: 22),
+      ),
     ]);
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-  final bool isDark;
-  const _StatCard({required this.icon, required this.label, required this.value, required this.color, required this.isDark});
+// ── Next Class Card ──
+class _NextClassCard extends StatelessWidget {
+  final dynamic nextClass;
+  final Duration? timeUntil;
+  const _NextClassCard({required this.nextClass, required this.timeUntil});
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
+    if (nextClass == null) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkCard : AppColors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+          gradient: LinearGradient(colors: [AppColors.primaryPurple, AppColors.primaryPurpleDark], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: AppColors.primaryPurple.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 8))],
         ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 8),
-            Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: color)),
-            const SizedBox(height: 4),
-            Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary, fontSize: 10), textAlign: TextAlign.center),
-          ],
-        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _badge('NEXT CLASS'),
+          const SizedBox(height: 12),
+          const Text('No upcoming classes', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text('Add your schedule to get started', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13)),
+        ]),
+      );
+    }
+
+    final hours = timeUntil?.inHours ?? 0;
+    final minutes = (timeUntil?.inMinutes ?? 0) % 60;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [AppColors.primaryPurple, AppColors.primaryPurpleDark], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: AppColors.primaryPurple.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 8))],
       ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _badge('NEXT CLASS'),
+        const SizedBox(height: 14),
+        Text(nextClass.namaMatkul, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 6),
+        Row(children: [
+          Icon(Icons.access_time_rounded, color: Colors.white.withValues(alpha: 0.8), size: 16),
+          const SizedBox(width: 6),
+          Text('${nextClass.jamMulai} - ${nextClass.ruangan}', style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14)),
+        ]),
+        const SizedBox(height: 18),
+        Row(children: [
+          // Countdown pill
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+            child: Text('Starts in ${hours}h ${minutes}m', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+          ),
+          const Spacer(),
+          // View Details
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('View Details', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13, fontWeight: FontWeight.w500)),
+              const SizedBox(width: 4),
+              Icon(Icons.arrow_forward_rounded, color: Colors.white.withValues(alpha: 0.9), size: 16),
+            ]),
+          ),
+        ]),
+      ]),
+    );
+  }
+
+  static Widget _badge(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
+      child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
     );
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  final String message;
+// ── Stat Card ──
+class _StatCard extends StatelessWidget {
   final IconData icon;
-  const _EmptyState({required this.message, required this.icon});
+  final String value;
+  final String label;
+  final String badge;
+  final bool isDark;
+  const _StatCard({required this.icon, required this.value, required this.label, required this.badge, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkCard : AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(icon, color: AppColors.primaryPurple, size: 22),
+          const Spacer(),
+          Text(badge, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint, letterSpacing: 0.5)),
+        ]),
+        const SizedBox(height: 10),
+        Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+        if (label.isNotEmpty) ...[
+          const SizedBox(height: 2),
+          Text(label, style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
+        ],
+      ]),
+    );
+  }
+}
+
+// ── Task Item ──
+class _TaskItem extends StatelessWidget {
+  final TugasModel tugas;
+  final bool isDark;
+  const _TaskItem({required this.tugas, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final deadlineStr = DateFormat('EEEE, h:mm a').format(tugas.deadline);
+    final isUrgent = tugas.prioritas == Prioritas.tinggi;
+    final diff = tugas.deadline.difference(DateTime.now());
+    final badgeText = isUrgent ? 'URGENT' : (diff.inDays <= 7 ? 'THIS WEEK' : 'UPCOMING');
+    final badgeColor = isUrgent ? AppColors.error : (diff.inDays <= 7 ? AppColors.warning : AppColors.primaryPurple);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkCard : AppColors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+      ),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // Checkbox
+        Container(
+          width: 22, height: 22,
+          margin: const EdgeInsets.only(top: 2),
+          decoration: BoxDecoration(
+            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border, width: 2),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Text(tugas.judul, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(color: badgeColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
+              child: Text(badgeText, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: badgeColor)),
+            ),
+          ]),
+          if (tugas.deskripsi.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(tugas.deskripsi, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
+          ],
+          const SizedBox(height: 8),
+          Row(children: [
+            Icon(Icons.calendar_today, size: 12, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint),
+            const SizedBox(width: 4),
+            Text(deadlineStr, style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
+          ]),
+        ])),
+      ]),
+    );
+  }
+}
+
+// ── Empty Box ──
+class _EmptyBox extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final bool isDark;
+  const _EmptyBox({required this.text, required this.icon, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : AppColors.primaryPurpleVeryLight,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(children: [
-        Icon(icon, size: 36, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint),
+        Icon(icon, size: 32, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint),
         const SizedBox(height: 8),
-        Text(message, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
+        Text(text, style: TextStyle(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
       ]),
     );
   }
