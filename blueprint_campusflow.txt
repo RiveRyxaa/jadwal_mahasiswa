@@ -1,0 +1,358 @@
+
+BLUEPRINT APLIKASI CAMPUSFLOW
+=============================
+
+NAMA APLIKASI:
+CampusFlow (Contoh Nama)
+
+JENIS APLIKASI:
+Aplikasi Jadwal Kuliah Pintar & Produktivitas Mahasiswa
+
+TARGET PENGGUNA:
+- Mahasiswa universitas
+- Mahasiswa aktif kuliah
+- Mahasiswa dengan jadwal padat
+
+==================================================
+1. TUJUAN UTAMA APLIKASI
+==================================================
+
+Aplikasi ini membantu mahasiswa untuk mengatur:
+- Jadwal kuliah
+- Deadline tugas
+- Reminder kegiatan
+- Produktivitas harian
+
+Tujuan utama:
+Membantu mahasiswa menjadi lebih terorganisir dan tidak lupa jadwal atau tugas.
+
+==================================================
+2. FITUR UTAMA (VERSI MVP)
+==================================================
+
+[1] AUTENTIKASI
+---------------
+Fitur:
+- Register akun
+- Login akun
+- Logout
+- Lupa password
+
+Data pengguna:
+- Nama lengkap
+- Email
+- Password
+- Universitas
+- Jurusan
+
+==================================================
+
+[2] DASHBOARD
+-------------
+Menampilkan:
+- Jadwal hari ini
+- Kelas berikutnya
+- Deadline tugas terdekat
+- Countdown menuju kelas berikutnya
+
+Contoh:
+--------------------------------
+Kelas Berikutnya:
+Basis Data
+09:00 - Ruang A204
+
+Dimulai dalam:
+1 jam 12 menit
+--------------------------------
+
+==================================================
+
+[3] MANAJEMEN JADWAL KULIAH
+---------------------------
+Fitur:
+- Tambah jadwal kuliah
+- Edit jadwal
+- Hapus jadwal
+- Tampilan jadwal mingguan
+
+Input:
+- Nama mata kuliah
+- Nama dosen
+- Hari
+- Jam mulai
+- Jam selesai
+- Ruangan
+- Catatan
+
+==================================================
+
+[4] TRACKER TUGAS
+-----------------
+Fitur:
+- Tambah tugas
+- Atur deadline
+- Tandai tugas selesai
+- Label prioritas
+
+Level prioritas:
+- Tinggi
+- Sedang
+- Rendah
+
+==================================================
+
+[5] SISTEM REMINDER
+-------------------
+Notifikasi:
+- Kelas dimulai 30 menit lagi
+- Deadline tugas besok
+- Event kampus penting
+
+Jenis reminder:
+- Notifikasi browser
+- Email reminder
+
+==================================================
+
+[6] DARK MODE
+-------------
+Pilihan tema:
+- Light mode
+- Dark mode
+
+Konsep desain:
+- Minimalis
+- Modern
+- Nyaman untuk mahasiswa
+
+==================================================
+3. FITUR PENGEMBANGAN KE DEPAN
+==================================================
+
+[1] AI ASSISTANT
+----------------
+Contoh:
+- "Kapan jadwal kosong saya minggu ini?"
+- "Tugas apa yang deadline besok?"
+
+==================================================
+
+[2] SCAN JADWAL DARI FOTO
+-------------------------
+Fitur:
+Upload foto jadwal lalu otomatis diubah menjadi data jadwal.
+
+==================================================
+
+[3] SHARE JADWAL TEMAN
+----------------------
+Fitur:
+- Lihat jadwal teman
+- Atur belajar kelompok
+
+==================================================
+
+[4] PETA KAMPUS
+---------------
+Fitur:
+- Lokasi gedung
+- Navigasi ruangan
+- Pencarian kelas
+
+==================================================
+4. TEKNOLOGI YANG DIGUNAKAN
+==================================================
+
+FRONTEND:
+- HTML
+- CSS
+- JavaScript
+ATAU
+- React.js
+
+BACKEND:
+- Node.js
+- Express.js
+
+DATABASE:
+- MongoDB
+ATAU
+- Supabase
+
+DEPLOYMENT:
+- Render
+- Vercel
+
+==================================================
+5. STRUKTUR DATABASE
+==================================================
+
+TABEL USERS
+------------
+id
+nama
+email
+password
+universitas
+jurusan
+created_at
+
+==================================================
+
+TABEL JADWAL
+-------------
+id
+user_id
+nama_matkul
+nama_dosen
+hari
+jam_mulai
+jam_selesai
+ruangan
+catatan
+
+==================================================
+
+TABEL TUGAS
+------------
+id
+user_id
+judul
+deskripsi
+deadline
+prioritas
+status
+
+==================================================
+6. HALAMAN APLIKASI
+==================================================
+
+[1] HALAMAN LOGIN
+-----------------
+- Input email
+- Input password
+- Tombol login
+
+==================================================
+
+[2] HALAMAN REGISTER
+--------------------
+- Nama lengkap
+- Email
+- Password
+- Universitas
+
+==================================================
+
+[3] HALAMAN DASHBOARD
+---------------------
+- Jadwal hari ini
+- Tugas terdekat
+- Countdown kelas
+
+==================================================
+
+[4] HALAMAN KALENDER
+--------------------
+- Tampilan mingguan
+- Tampilan bulanan
+
+==================================================
+
+[5] HALAMAN PROFIL
+------------------
+- Edit profil
+- Ganti password
+- Pengaturan tema
+
+==================================================
+7. STRUKTUR PROJECT
+==================================================
+
+project/
+│
+├── client/
+│   ├── html
+│   ├── css
+│   ├── js
+│
+├── server/
+│   ├── routes/
+│   ├── controllers/
+│   ├── models/
+│   ├── middleware/
+│
+├── database/
+│
+├── public/
+│
+└── package.json
+
+==================================================
+8. ROADMAP PENGEMBANGAN
+==================================================
+
+PHASE 1
+-------
+- Setup project
+- Login/Register
+- Koneksi database
+
+PHASE 2
+-------
+- CRUD jadwal kuliah
+- Dashboard utama
+
+PHASE 3
+-------
+- Tracker tugas
+- Sistem reminder
+
+PHASE 4
+-------
+- Improve UI/UX
+- Dark mode
+- Responsive mobile
+
+PHASE 5
+-------
+- Deploy ke Render/Vercel
+- Testing
+- Optimasi performa
+
+==================================================
+9. KONSEP DESAIN
+==================================================
+
+WARNA:
+- Putih
+- Abu gelap
+- Biru modern
+
+STYLE:
+- Clean
+- Modern
+- Produktif
+- Startup aesthetic
+
+INSPIRASI:
+- Notion
+- Google Calendar
+- Todoist
+
+==================================================
+10. TUJUAN PROJECT
+==================================================
+
+Jangka Pendek:
+- Menjadi aplikasi produktivitas mahasiswa yang berguna
+
+Jangka Panjang:
+- Rilis publik
+- Support banyak kampus
+- Versi mobile app
+- AI assistant untuk jadwal
+
+==================================================
+AKHIR BLUEPRINT
+==================================================
