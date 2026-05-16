@@ -7,6 +7,9 @@ import '../../providers/auth_provider.dart';
 import '../../providers/jadwal_provider.dart';
 import '../../providers/tugas_provider.dart';
 import '../../models/tugas_model.dart';
+import '../main_navigation.dart';
+import '../jadwal/tambah_jadwal_screen.dart';
+import '../tugas/tambah_tugas_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -60,7 +63,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 24),
 
               // ── Next Class Card ──
-              _NextClassCard(nextClass: nextClass, timeUntil: timeUntil),
+              _NextClassCard(
+                nextClass: nextClass,
+                timeUntil: timeUntil,
+                onViewDetails: () {
+                  if (nextClass != null) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => TambahJadwalScreen(jadwal: nextClass)),
+                    );
+                  }
+                },
+              ),
               const SizedBox(height: 16),
 
               // ── Stats Row ──
@@ -73,12 +86,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   isDark: isDark,
                 )),
                 const SizedBox(width: 12),
-                Expanded(child: _StatCard(
-                  icon: Icons.check_circle_outline,
-                  value: '$selesai/$totalTugas',
-                  label: '',
-                  badge: 'TASKS DONE',
-                  isDark: isDark,
+                Expanded(child: GestureDetector(
+                  onTap: () => MainNavigation.switchTab(context, 2),
+                  child: _StatCard(
+                    icon: Icons.check_circle_outline,
+                    value: '$selesai/$totalTugas',
+                    label: '',
+                    badge: 'TASKS DONE',
+                    isDark: isDark,
+                  ),
                 )),
               ]),
               const SizedBox(height: 28),
@@ -87,7 +103,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Row(children: [
                 Text("Today's Schedule", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                 const Spacer(),
-                Text('View All', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
+                GestureDetector(
+                  onTap: () => MainNavigation.switchTab(context, 1),
+                  child: const Text('View All', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
+                ),
               ]),
               const SizedBox(height: 14),
               if (todayJadwal.isEmpty)
@@ -98,44 +117,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   final hour = int.parse(sp[0]);
                   final ampm = hour >= 12 ? 'PM' : 'AM';
                   final h12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-                  final timeStr = '${h12.toString().padLeft(2,'0')}:${sp[1]}';
+                  final timeStr = '${h12.toString().padLeft(2, '0')}:${sp[1]}';
                   final startMin = int.parse(sp[0]) * 60 + int.parse(sp[1]);
                   final ep = j.jamSelesai.split(':');
                   final endMin = int.parse(ep[0]) * 60 + int.parse(ep[1]);
                   final isLive = currentMin >= startMin && currentMin < endMin;
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isLive ? AppColors.primaryPurple : (isDark ? AppColors.darkCard : AppColors.white),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: isLive ? AppColors.primaryPurple : (isDark ? AppColors.darkBorder : AppColors.divider)),
-                    ),
-                    child: Row(children: [
-                      // Time pill
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isLive ? Colors.white.withValues(alpha: 0.2) : (isDark ? AppColors.darkSurface : AppColors.primaryPurpleVeryLight),
-                          borderRadius: BorderRadius.circular(8),
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => TambahJadwalScreen(jadwal: j)),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isLive ? AppColors.primaryPurple : (isDark ? AppColors.darkCard : AppColors.white),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: isLive ? AppColors.primaryPurple : (isDark ? AppColors.darkBorder : AppColors.divider)),
+                      ),
+                      child: Row(children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isLive ? Colors.white.withValues(alpha: 0.2) : (isDark ? AppColors.darkSurface : AppColors.primaryPurpleVeryLight),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(children: [
+                            Text(timeStr, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: isLive ? Colors.white : AppColors.primaryPurple)),
+                            Text(ampm, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: isLive ? Colors.white.withValues(alpha: 0.7) : AppColors.primaryPurple.withValues(alpha: 0.6))),
+                          ]),
                         ),
-                        child: Column(children: [
-                          Text(timeStr, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: isLive ? Colors.white : AppColors.primaryPurple)),
-                          Text(ampm, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: isLive ? Colors.white.withValues(alpha: 0.7) : AppColors.primaryPurple.withValues(alpha: 0.6))),
-                        ]),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(j.namaMatkul, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: isLive ? Colors.white : null)),
-                        Text('Lec. ${j.ruangan} • ${j.namaDosen}', style: TextStyle(fontSize: 11, color: isLive ? Colors.white.withValues(alpha: 0.7) : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary))),
-                      ])),
-                      if (isLive) Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6)),
-                        child: const Text('LIVE', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
-                      ),
-                    ]),
+                        const SizedBox(width: 12),
+                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(j.namaMatkul, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: isLive ? Colors.white : null)),
+                          Text('Lec. ${j.ruangan} • ${j.namaDosen}', style: TextStyle(fontSize: 11, color: isLive ? Colors.white.withValues(alpha: 0.7) : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary))),
+                        ])),
+                        if (isLive) Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6)),
+                          child: const Text('LIVE', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                        ),
+                      ]),
+                    ),
                   );
                 }),
 
@@ -145,35 +170,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Row(children: [
                 Text('Upcoming Tasks', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                 const Spacer(),
-                Container(
-                  width: 28, height: 28,
-                  decoration: BoxDecoration(color: AppColors.primaryPurple, borderRadius: BorderRadius.circular(8)),
-                  child: const Icon(Icons.add, color: Colors.white, size: 16),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const TambahTugasScreen()),
+                    );
+                  },
+                  child: Container(
+                    width: 28, height: 28,
+                    decoration: BoxDecoration(color: AppColors.primaryPurple, borderRadius: BorderRadius.circular(8)),
+                    child: const Icon(Icons.add, color: Colors.white, size: 16),
+                  ),
                 ),
               ]),
               const SizedBox(height: 14),
               if (tugasProv.tugasDeadlineTerdekat.isEmpty)
                 _EmptyBox(text: 'No upcoming tasks', icon: Icons.task_alt, isDark: isDark)
               else
-                ...tugasProv.tugasDeadlineTerdekat.take(3).map((t) => _TaskItem(tugas: t, isDark: isDark)),
+                ...tugasProv.tugasDeadlineTerdekat.take(3).map((t) => _TaskItem(
+                  tugas: t,
+                  isDark: isDark,
+                  onToggle: () {
+                    final userId = auth.currentUser?.id ?? '';
+                    tugasProv.toggleStatus(userId, t.id);
+                  },
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => TambahTugasScreen(tugas: t)),
+                    );
+                  },
+                )),
 
               // More tasks hint
               if (tugasProv.tugasAktif.length > 3) ...[
                 const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : AppColors.primaryPurpleVeryLight.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+                GestureDetector(
+                  onTap: () => MainNavigation.switchTab(context, 2),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkCard : AppColors.primaryPurpleVeryLight.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+                    ),
+                    child: Column(children: [
+                      Text('You have ${tugasProv.tugasAktif.length - 3} more tasks later this month.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary), textAlign: TextAlign.center),
+                      const SizedBox(height: 6),
+                      const Text('View full roadmap', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
+                    ]),
                   ),
-                  child: Column(children: [
-                    Text('You have ${tugasProv.tugasAktif.length - 3} more tasks later this month.',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary), textAlign: TextAlign.center),
-                    const SizedBox(height: 6),
-                    Text('View full roadmap', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
-                  ]),
                 ),
               ],
             ],
@@ -207,14 +254,26 @@ class _TopBar extends StatelessWidget {
       const SizedBox(width: 10),
       Text('CampusFlow', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryPurple, fontWeight: FontWeight.bold)),
       const Spacer(),
-      Container(
-        width: 40, height: 40,
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.darkCard : AppColors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+      GestureDetector(
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Notifications coming soon!'),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        },
+        child: Container(
+          width: 40, height: 40,
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkCard : AppColors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+          ),
+          child: Icon(Icons.notifications_none_rounded, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary, size: 22),
         ),
-        child: Icon(Icons.notifications_none_rounded, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary, size: 22),
       ),
     ]);
   }
@@ -224,7 +283,8 @@ class _TopBar extends StatelessWidget {
 class _NextClassCard extends StatelessWidget {
   final dynamic nextClass;
   final Duration? timeUntil;
-  const _NextClassCard({required this.nextClass, required this.timeUntil});
+  final VoidCallback? onViewDetails;
+  const _NextClassCard({required this.nextClass, required this.timeUntil, this.onViewDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -270,22 +330,23 @@ class _NextClassCard extends StatelessWidget {
         ]),
         const SizedBox(height: 18),
         Row(children: [
-          // Countdown pill
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
             child: Text('Starts in ${hours}h ${minutes}m', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
           ),
           const Spacer(),
-          // View Details
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text('View Details', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13, fontWeight: FontWeight.w500)),
-              const SizedBox(width: 4),
-              Icon(Icons.arrow_forward_rounded, color: Colors.white.withValues(alpha: 0.9), size: 16),
-            ]),
+          GestureDetector(
+            onTap: onViewDetails,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text('View Details', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13, fontWeight: FontWeight.w500)),
+                const SizedBox(width: 4),
+                Icon(Icons.arrow_forward_rounded, color: Colors.white.withValues(alpha: 0.9), size: 16),
+              ]),
+            ),
           ),
         ]),
       ]),
@@ -340,7 +401,9 @@ class _StatCard extends StatelessWidget {
 class _TaskItem extends StatelessWidget {
   final TugasModel tugas;
   final bool isDark;
-  const _TaskItem({required this.tugas, required this.isDark});
+  final VoidCallback? onToggle;
+  final VoidCallback? onTap;
+  const _TaskItem({required this.tugas, required this.isDark, this.onToggle, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -349,47 +412,56 @@ class _TaskItem extends StatelessWidget {
     final diff = tugas.deadline.difference(DateTime.now());
     final badgeText = isUrgent ? 'URGENT' : (diff.inDays <= 7 ? 'THIS WEEK' : 'UPCOMING');
     final badgeColor = isUrgent ? AppColors.error : (diff.inDays <= 7 ? AppColors.warning : AppColors.primaryPurple);
+    final isCompleted = tugas.status == StatusTugas.selesai;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
-      ),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Checkbox
-        Container(
-          width: 22, height: 22,
-          margin: const EdgeInsets.only(top: 2),
-          decoration: BoxDecoration(
-            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border, width: 2),
-            borderRadius: BorderRadius.circular(6),
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : AppColors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
         ),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(child: Text(tugas.judul, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: badgeColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
-              child: Text(badgeText, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: badgeColor)),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Checkbox - tappable
+          GestureDetector(
+            onTap: onToggle,
+            child: Container(
+              width: 22, height: 22,
+              margin: const EdgeInsets.only(top: 2),
+              decoration: BoxDecoration(
+                color: isCompleted ? AppColors.primaryPurple : Colors.transparent,
+                border: Border.all(color: isCompleted ? AppColors.primaryPurple : (isDark ? AppColors.darkBorder : AppColors.border), width: 2),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: isCompleted ? const Icon(Icons.check, size: 14, color: Colors.white) : null,
             ),
-          ]),
-          if (tugas.deskripsi.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(tugas.deskripsi, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
-          ],
-          const SizedBox(height: 8),
-          Row(children: [
-            Icon(Icons.calendar_today, size: 12, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint),
-            const SizedBox(width: 4),
-            Text(deadlineStr, style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
-          ]),
-        ])),
-      ]),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Expanded(child: Text(tugas.judul, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, decoration: isCompleted ? TextDecoration.lineThrough : null))),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(color: badgeColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
+                child: Text(badgeText, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: badgeColor)),
+              ),
+            ]),
+            if (tugas.deskripsi.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(tugas.deskripsi, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
+            ],
+            const SizedBox(height: 8),
+            Row(children: [
+              Icon(Icons.calendar_today, size: 12, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint),
+              const SizedBox(width: 4),
+              Text(deadlineStr, style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
+            ]),
+          ])),
+        ]),
+      ),
     );
   }
 }

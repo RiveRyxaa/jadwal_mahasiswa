@@ -7,12 +7,23 @@ import 'profil/profil_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
+
+  /// Allow child screens to switch tabs
+  static void switchTab(BuildContext context, int index) {
+    final state = context.findAncestorStateOfType<_MainNavigationState>();
+    state?._setTab(index);
+  }
+
   @override
   State<MainNavigation> createState() => _MainNavigationState();
 }
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
+
+  void _setTab(int index) {
+    setState(() => _currentIndex = index);
+  }
 
   final _screens = const [
     DashboardScreen(),
@@ -55,7 +66,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   activeIcon: Icons.home_rounded,
                   label: 'Home',
                   isSelected: _currentIndex == 0,
-                  onTap: () => setState(() => _currentIndex = 0),
+                  onTap: () => _setTab(0),
                   isDark: isDark,
                 ),
                 _NavItem(
@@ -63,7 +74,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   activeIcon: Icons.calendar_month_rounded,
                   label: 'Schedule',
                   isSelected: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
+                  onTap: () => _setTab(1),
                   isDark: isDark,
                 ),
                 _NavItem(
@@ -71,7 +82,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   activeIcon: Icons.check_circle_rounded,
                   label: 'Tasks',
                   isSelected: _currentIndex == 2,
-                  onTap: () => setState(() => _currentIndex = 2),
+                  onTap: () => _setTab(2),
                   isDark: isDark,
                 ),
                 _NavItem(
@@ -79,7 +90,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   activeIcon: Icons.person_rounded,
                   label: 'Profile',
                   isSelected: _currentIndex == 3,
-                  onTap: () => setState(() => _currentIndex = 3),
+                  onTap: () => _setTab(3),
                   isDark: isDark,
                 ),
               ],

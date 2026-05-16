@@ -48,14 +48,26 @@ class TugasScreen extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text('CampusFlow', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryPurple, fontWeight: FontWeight.bold)),
                 const Spacer(),
-                Container(
-                  width: 40, height: 40,
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : AppColors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+                GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Notifications coming soon!'),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 40, height: 40,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkCard : AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
+                    ),
+                    child: Icon(Icons.notifications_none_rounded, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary, size: 22),
                   ),
-                  child: Icon(Icons.notifications_none_rounded, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary, size: 22),
                 ),
               ]),
 
