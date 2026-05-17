@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "308837170278",
+    "project_id": "sobatkuliah-f6c16",
+    "storage_bucket": "sobatkuliah-f6c16.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308837170278:android:17bc3e8b5973ede43341a7",
+        "android_client_info": {
+          "package_name": "com.example.apk_mahasiswa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_l8SLN9HsKvLm9xYhlEOfZ1v6Vw1t2Mw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

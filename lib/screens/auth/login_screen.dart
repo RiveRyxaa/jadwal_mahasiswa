@@ -290,19 +290,21 @@ class _LoginScreenState extends State<LoginScreen>
                                   child: SocialButton(
                                     text: 'Google',
                                     icon: Icons.g_mobiledata_rounded,
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: const Text(
-                                              'Google login coming soon!'),
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                    onPressed: () async {
+                                      final auth = context.read<AuthProvider>();
+                                      final success = await auth.loginWithGoogle();
+                                      if (success && context.mounted) {
+                                        Navigator.of(context).pushReplacementNamed('/home');
+                                      } else if (context.mounted && auth.error != null) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(auth.error!),
+                                            backgroundColor: AppColors.error,
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                           ),
-                                        ),
-                                      );
+                                        );
+                                      }
                                     },
                                   ),
                                 ),
@@ -311,19 +313,21 @@ class _LoginScreenState extends State<LoginScreen>
                                   child: SocialButton(
                                     text: 'SSO',
                                     icon: Icons.key_rounded,
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: const Text(
-                                              'SSO login coming soon!'),
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                    onPressed: () async {
+                                      final auth = context.read<AuthProvider>();
+                                      final success = await auth.loginWithGoogle();
+                                      if (success && context.mounted) {
+                                        Navigator.of(context).pushReplacementNamed('/home');
+                                      } else if (context.mounted && auth.error != null) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(auth.error!),
+                                            backgroundColor: AppColors.error,
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                           ),
-                                        ),
-                                      );
+                                        );
+                                      }
                                     },
                                   ),
                                 ),

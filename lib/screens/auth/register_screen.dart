@@ -105,6 +105,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       CustomTextField(controller: _jurusanController, labelText: 'Jurusan', hintText: 'Nama jurusan', prefixIcon: Icons.book_outlined),
                       const SizedBox(height: 28),
                       CustomButton(text: 'Register', onPressed: _handleRegister, isLoading: auth.isLoading),
+                      const SizedBox(height: 20),
+                      Row(children: [
+                        Expanded(child: Divider(color: isDark ? AppColors.darkBorder : AppColors.divider)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text('OR', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary, letterSpacing: 0.5)),
+                        ),
+                        Expanded(child: Divider(color: isDark ? AppColors.darkBorder : AppColors.divider)),
+                      ]),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 54,
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            final auth = context.read<AuthProvider>();
+                            final success = await auth.loginWithGoogle();
+                            if (success && context.mounted) {
+                              Navigator.of(context).pushReplacementNamed('/home');
+                            } else if (context.mounted && auth.error != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(auth.error!), backgroundColor: AppColors.error, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.g_mobiledata_rounded, size: 24),
+                          label: const Text('Daftar dengan Google', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primaryPurple,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            side: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border, width: 1.5),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
