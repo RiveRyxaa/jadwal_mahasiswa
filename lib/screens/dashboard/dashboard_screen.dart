@@ -252,7 +252,7 @@ class _TopBar extends StatelessWidget {
         )),
       ),
       const SizedBox(width: 10),
-      Text('CampusFlow', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryPurple, fontWeight: FontWeight.bold)),
+      Text('SobatKuliah', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.primaryPurple, fontWeight: FontWeight.bold)),
       const Spacer(),
       GestureDetector(
         onTap: () {

@@ -10,11 +10,11 @@ import 'screens/main_navigation.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const CampusFlowApp());
+  runApp(const SobatKuliahApp());
 }
 
-class CampusFlowApp extends StatelessWidget {
-  const CampusFlowApp({super.key});
+class SobatKuliahApp extends StatelessWidget {
+  const SobatKuliahApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class CampusFlowApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProv, _) {
           return MaterialApp(
-            title: 'CampusFlow',
+            title: 'SobatKuliah',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
@@ -118,22 +118,17 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: const Icon(
-                    Icons.school_rounded,
-                    color: Colors.white,
-                    size: 42,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(22),
+                  child: Image.asset(
+                    'assets/icon.png',
+                    width: 80,
+                    height: 80,
                   ),
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'CampusFlow',
+                  'SobatKuliah',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 28,

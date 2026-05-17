@@ -94,38 +94,18 @@ class _LoginScreenState extends State<LoginScreen>
                   children: [
                     const SizedBox(height: 20),
                     // Logo
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.primaryPurple,
-                            AppColors.primaryPurpleDark,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                AppColors.primaryPurple.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.school_rounded,
-                        color: Colors.white,
-                        size: 36,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        'assets/icon.png',
+                        width: 72,
+                        height: 72,
                       ),
                     ),
                     const SizedBox(height: 20),
                     // App Name
                     Text(
-                      'CampusFlow',
+                      'SobatKuliah',
                       style:
                           Theme.of(context).textTheme.headlineMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -399,7 +379,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                     // Footer
                     Text(
-                      '© 2024 CampusFlow Academic Systems. All rights reserved.',
+                      '© 2024 SobatKuliah. All rights reserved.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: isDark
                                 ? AppColors.darkTextSecondary

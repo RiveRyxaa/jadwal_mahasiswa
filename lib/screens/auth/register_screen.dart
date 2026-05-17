@@ -67,19 +67,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             children: [
               const SizedBox(height: 40),
-              Container(
-                width: 64, height: 64,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [AppColors.primaryPurple, AppColors.primaryPurpleDark]),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [BoxShadow(color: AppColors.primaryPurple.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 6))],
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.asset(
+                  'assets/icon.png',
+                  width: 64,
+                  height: 64,
                 ),
-                child: const Icon(Icons.school_rounded, color: Colors.white, size: 32),
               ),
               const SizedBox(height: 16),
               Text('Create Account', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryPurple)),
               const SizedBox(height: 6),
-              Text('Join CampusFlow and organize your academic life', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary), textAlign: TextAlign.center),
+              Text('Join SobatKuliah and organize your academic life', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary), textAlign: TextAlign.center),
               const SizedBox(height: 32),
               Container(
                 padding: const EdgeInsets.all(28),

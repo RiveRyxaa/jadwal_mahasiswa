@@ -85,7 +85,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'CampusFlow',
+                    'SobatKuliah',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppColors.primaryPurple,
                           fontWeight: FontWeight.bold,

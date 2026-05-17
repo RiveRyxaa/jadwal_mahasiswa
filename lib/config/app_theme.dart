@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Primary Purple Palette
-  static const Color primaryPurple = Color(0xFF6C3FC5);
-  static const Color primaryPurpleDark = Color(0xFF5A2DB5);
-  static const Color primaryPurpleLight = Color(0xFF8B6CD4);
-  static const Color primaryPurpleVeryLight = Color(0xFFF3EEFA);
+  // Primary Navy Blue Palette
+  static const Color primaryPurple = Color(0xFF1B365D);
+  static const Color primaryPurpleDark = Color(0xFF122647);
+  static const Color primaryPurpleLight = Color(0xFF2E5C9A);
+  static const Color primaryPurpleVeryLight = Color(0xFFE8EDF5);
 
   // Neutrals
   static const Color white = Color(0xFFFFFFFF);
-  static const Color background = Color(0xFFF8F6FC);
+  static const Color background = Color(0xFFF5F7FA);
   static const Color cardBackground = Color(0xFFFFFFFF);
   static const Color textPrimary = Color(0xFF1A1A2E);
   static const Color textSecondary = Color(0xFF6B7280);
@@ -30,12 +30,12 @@ class AppColors {
   static const Color info = Color(0xFF3B82F6);
 
   // Dark Mode Colors
-  static const Color darkBackground = Color(0xFF0F0F1A);
-  static const Color darkCard = Color(0xFF1A1A2E);
-  static const Color darkSurface = Color(0xFF232340);
+  static const Color darkBackground = Color(0xFF0B1929);
+  static const Color darkCard = Color(0xFF122647);
+  static const Color darkSurface = Color(0xFF1B365D);
   static const Color darkTextPrimary = Color(0xFFF1F1F6);
   static const Color darkTextSecondary = Color(0xFF9CA3AF);
-  static const Color darkBorder = Color(0xFF2D2D4A);
+  static const Color darkBorder = Color(0xFF1E3A5F);
 }
 
 class AppTheme {
