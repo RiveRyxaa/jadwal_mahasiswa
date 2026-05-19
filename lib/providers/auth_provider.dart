@@ -20,8 +20,16 @@ class AuthProvider extends ChangeNotifier {
   final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  /// Try to auto-login from SharedPreferences
+  // ─── Auto Login ───
   Future<bool> tryAutoLogin() async {
+    // Check Firebase auth state first
+    final fbUser = _firebaseAuth.currentUser;
+    if (fbUser != null) {
+      await _loadOrCreateLocalProfile(fbUser);
+      return true;
+    }
+
+    // Fallback to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     final userData = prefs.getString('current_user');
     if (userData == null) return false;
@@ -35,7 +43,92 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Login with Google + Firebase
+  // ─── Register with Email + Password ───
+  Future<bool> register({
+    required String nama,
+    required String email,
+    required String password,
+    String universitas = '',
+    String jurusan = '',
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      // Register in Firebase (single source of truth for auth)
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Update display name in Firebase
+      await credential.user?.updateDisplayName(nama);
+
+      // Save profile data locally
+      final newUser = UserModel(
+        id: credential.user!.uid,
+        nama: nama,
+        email: email,
+        password: '', // No longer store password locally
+        universitas: universitas,
+        jurusan: jurusan,
+      );
+
+      await _saveLocalProfile(newUser);
+      _currentUser = newUser;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on fb.FirebaseAuthException catch (e) {
+      _error = _getFirebaseError(e.code);
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _error = 'Terjadi kesalahan: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // ─── Login with Email + Password ───
+  Future<bool> login({
+    required String email,
+    required String password,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      // Authenticate via Firebase (password check happens here)
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Load or create local profile
+      await _loadOrCreateLocalProfile(credential.user!);
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on fb.FirebaseAuthException catch (e) {
+      _error = _getFirebaseError(e.code);
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _error = 'Terjadi kesalahan: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // ─── Login with Google ───
   Future<bool> loginWithGoogle() async {
     _isLoading = true;
     _error = null;
@@ -49,43 +142,15 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      // Get Google auth details
       final googleAuth = await googleUser.authentication;
       final credential = fb.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Sign in to Firebase
-      await _firebaseAuth.signInWithCredential(credential);
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      await _loadOrCreateLocalProfile(userCredential.user!);
 
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString('users_list') ?? '[]';
-      final List<dynamic> users = jsonDecode(usersJson);
-
-      // Check if user already exists locally
-      final existingUser = users.cast<Map<String, dynamic>>().firstWhere(
-            (u) => u['email'] == googleUser.email,
-            orElse: () => <String, dynamic>{},
-          );
-
-      if (existingUser.isNotEmpty) {
-        _currentUser = UserModel.fromJson(existingUser);
-      } else {
-        final newUser = UserModel(
-          id: _uuid.v4(),
-          nama: googleUser.displayName ?? googleUser.email.split('@')[0],
-          email: googleUser.email,
-          password: 'google_auth',
-          universitas: '',
-          jurusan: '',
-        );
-        users.add(newUser.toJson());
-        await prefs.setString('users_list', jsonEncode(users));
-        _currentUser = newUser;
-      }
-
-      await prefs.setString('current_user', _currentUser!.toJsonString());
       _isLoading = false;
       notifyListeners();
       return true;
@@ -97,126 +162,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Register a new user (also registers in Firebase)
-  Future<bool> register({
-    required String nama,
-    required String email,
-    required String password,
-    String universitas = '',
-    String jurusan = '',
-  }) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
-    try {
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString('users_list') ?? '[]';
-      final List<dynamic> users = jsonDecode(usersJson);
-
-      final emailExists = users.any((u) => u['email'] == email);
-      if (emailExists) {
-        _error = 'Email sudah terdaftar';
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-
-      // Register in Firebase Auth
-      try {
-        await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      } on fb.FirebaseAuthException catch (e) {
-        if (e.code == 'email-already-in-use') {
-          // If already in Firebase, try to sign in
-          await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-        } else {
-          _error = _getFirebaseError(e.code);
-          _isLoading = false;
-          notifyListeners();
-          return false;
-        }
-      }
-
-      final newUser = UserModel(
-        id: _uuid.v4(),
-        nama: nama,
-        email: email,
-        password: password,
-        universitas: universitas,
-        jurusan: jurusan,
-      );
-
-      users.add(newUser.toJson());
-      await prefs.setString('users_list', jsonEncode(users));
-      _currentUser = newUser;
-      await prefs.setString('current_user', newUser.toJsonString());
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Login with email and password
-  Future<bool> login({
-    required String email,
-    required String password,
-  }) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
-    try {
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString('users_list') ?? '[]';
-      final List<dynamic> users = jsonDecode(usersJson);
-
-      final userJson = users.cast<Map<String, dynamic>>().firstWhere(
-            (u) => u['email'] == email && u['password'] == password,
-            orElse: () => <String, dynamic>{},
-          );
-
-      if (userJson.isEmpty) {
-        _error = 'Email atau password salah';
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-
-      // Also sign in to Firebase
-      try {
-        await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-      } catch (_) {
-        // Firebase sign-in is optional, local login still works
-      }
-
-      _currentUser = UserModel.fromJson(userJson);
-      await prefs.setString('current_user', _currentUser!.toJsonString());
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Logout
+  // ─── Logout ───
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('current_user');
@@ -228,7 +174,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Update user profile
+  // ─── Update Profile ───
   Future<bool> updateProfile({
     String? nama,
     String? universitas,
@@ -237,23 +183,19 @@ class AuthProvider extends ChangeNotifier {
     if (_currentUser == null) return false;
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-
       _currentUser = _currentUser!.copyWith(
         nama: nama,
         universitas: universitas,
         jurusan: jurusan,
       );
 
-      final usersJson = prefs.getString('users_list') ?? '[]';
-      final List<dynamic> users = jsonDecode(usersJson);
-      final index = users.indexWhere((u) => u['id'] == _currentUser!.id);
-      if (index != -1) {
-        users[index] = _currentUser!.toJson();
-        await prefs.setString('users_list', jsonEncode(users));
+      // Update Firebase display name
+      if (nama != null) {
+        await _firebaseAuth.currentUser?.updateDisplayName(nama);
       }
 
-      await prefs.setString('current_user', _currentUser!.toJsonString());
+      await _saveLocalProfile(_currentUser!);
+      await _updateProfileInList(_currentUser!);
       notifyListeners();
       return true;
     } catch (e) {
@@ -261,40 +203,42 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Change password
+  // ─── Change Password ───
   Future<bool> changePassword({
     required String oldPassword,
     required String newPassword,
   }) async {
     if (_currentUser == null) return false;
 
-    if (_currentUser!.password != oldPassword) {
-      _error = 'Password lama salah';
-      notifyListeners();
-      return false;
-    }
-
     try {
-      final prefs = await SharedPreferences.getInstance();
-      _currentUser = _currentUser!.copyWith(password: newPassword);
-
-      // Update Firebase password
-      try {
-        await _firebaseAuth.currentUser?.updatePassword(newPassword);
-      } catch (_) {}
-
-      final usersJson = prefs.getString('users_list') ?? '[]';
-      final List<dynamic> users = jsonDecode(usersJson);
-      final index = users.indexWhere((u) => u['id'] == _currentUser!.id);
-      if (index != -1) {
-        users[index] = _currentUser!.toJson();
-        await prefs.setString('users_list', jsonEncode(users));
+      final user = _firebaseAuth.currentUser;
+      if (user == null || user.email == null) {
+        _error = 'User tidak ditemukan';
+        notifyListeners();
+        return false;
       }
 
-      await prefs.setString('current_user', _currentUser!.toJsonString());
+      // Re-authenticate with old password
+      final credential = fb.EmailAuthProvider.credential(
+        email: user.email!,
+        password: oldPassword,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      // Update password in Firebase
+      await user.updatePassword(newPassword);
+
       _error = null;
       notifyListeners();
       return true;
+    } on fb.FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        _error = 'Password lama salah';
+      } else {
+        _error = _getFirebaseError(e.code);
+      }
+      notifyListeners();
+      return false;
     } catch (e) {
       _error = 'Terjadi kesalahan';
       notifyListeners();
@@ -302,50 +246,94 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Check if email is registered
-  Future<bool> isEmailRegistered(String email) async {
-    final prefs = await SharedPreferences.getInstance();
-    final usersJson = prefs.getString('users_list') ?? '[]';
-    final List<dynamic> users = jsonDecode(usersJson);
-    return users.any((u) => u['email'] == email);
-  }
-
-  /// Reset password by email (after Google verification)
-  Future<bool> resetPasswordByEmail({
-    required String email,
-    required String newPassword,
-  }) async {
+  // ─── Send Password Reset Email ───
+  Future<bool> sendPasswordReset(String email) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString('users_list') ?? '[]';
-      final List<dynamic> users = jsonDecode(usersJson);
-      final index = users.indexWhere((u) => u['email'] == email);
-
-      if (index == -1) return false;
-
-      users[index]['password'] = newPassword;
-      await prefs.setString('users_list', jsonEncode(users));
-
-      if (_currentUser?.email == email) {
-        _currentUser = _currentUser!.copyWith(password: newPassword);
-        await prefs.setString('current_user', _currentUser!.toJsonString());
-        notifyListeners();
-      }
-
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
       return true;
     } catch (e) {
       return false;
     }
   }
 
+  // ─── Helper: Load or create local profile from Firebase user ───
+  Future<void> _loadOrCreateLocalProfile(fb.User fbUser) async {
+    final prefs = await SharedPreferences.getInstance();
+    final usersJson = prefs.getString('users_list') ?? '[]';
+    final List<dynamic> users = jsonDecode(usersJson);
+
+    final existing = users.cast<Map<String, dynamic>>().firstWhere(
+          (u) => u['email'] == fbUser.email,
+          orElse: () => <String, dynamic>{},
+        );
+
+    if (existing.isNotEmpty) {
+      _currentUser = UserModel.fromJson(existing);
+    } else {
+      final newUser = UserModel(
+        id: fbUser.uid,
+        nama: fbUser.displayName ?? fbUser.email?.split('@')[0] ?? 'User',
+        email: fbUser.email ?? '',
+        password: '',
+        universitas: '',
+        jurusan: '',
+      );
+      users.add(newUser.toJson());
+      await prefs.setString('users_list', jsonEncode(users));
+      _currentUser = newUser;
+    }
+
+    await prefs.setString('current_user', _currentUser!.toJsonString());
+    notifyListeners();
+  }
+
+  // ─── Helper: Save profile locally ───
+  Future<void> _saveLocalProfile(UserModel user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('current_user', user.toJsonString());
+
+    final usersJson = prefs.getString('users_list') ?? '[]';
+    final List<dynamic> users = jsonDecode(usersJson);
+    final index = users.indexWhere((u) => u['email'] == user.email);
+    if (index != -1) {
+      users[index] = user.toJson();
+    } else {
+      users.add(user.toJson());
+    }
+    await prefs.setString('users_list', jsonEncode(users));
+  }
+
+  // ─── Helper: Update profile in users list ───
+  Future<void> _updateProfileInList(UserModel user) async {
+    final prefs = await SharedPreferences.getInstance();
+    final usersJson = prefs.getString('users_list') ?? '[]';
+    final List<dynamic> users = jsonDecode(usersJson);
+    final index = users.indexWhere((u) => u['id'] == user.id);
+    if (index != -1) {
+      users[index] = user.toJson();
+      await prefs.setString('users_list', jsonEncode(users));
+    }
+    await prefs.setString('current_user', user.toJsonString());
+  }
+
+  // ─── Helper: Firebase error messages ───
   String _getFirebaseError(String code) {
     switch (code) {
       case 'email-already-in-use':
         return 'Email sudah digunakan';
       case 'weak-password':
-        return 'Password terlalu lemah';
+        return 'Password terlalu lemah (minimal 6 karakter)';
       case 'invalid-email':
         return 'Format email tidak valid';
+      case 'user-not-found':
+        return 'Email tidak terdaftar';
+      case 'wrong-password':
+      case 'invalid-credential':
+        return 'Email atau password salah';
+      case 'too-many-requests':
+        return 'Terlalu banyak percobaan. Coba lagi nanti.';
+      case 'user-disabled':
+        return 'Akun telah dinonaktifkan';
       default:
         return 'Terjadi kesalahan ($code)';
     }

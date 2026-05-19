@@ -383,7 +383,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                     // Footer
                     Text(
-                      '© 2024 SobatKuliah. All rights reserved.',
+                      '© 2026 SobatKuliah. All rights reserved.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: isDark
                                 ? AppColors.darkTextSecondary

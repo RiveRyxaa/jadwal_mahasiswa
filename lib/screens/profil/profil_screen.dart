@@ -5,6 +5,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_button.dart';
+import 'contact_screen.dart';
 
 class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
@@ -80,6 +81,9 @@ class _ProfilScreenState extends State<ProfilScreen> {
             _SettingsTile(icon: Icons.lock_outline, title: 'Ganti Password', onTap: () {
               _oldPassController.clear(); _newPassController.clear();
               setState(() { _isChangingPassword = true; _isEditingProfile = false; });
+            }),
+            _SettingsTile(icon: Icons.headset_mic_outlined, title: 'Hubungi Kami', onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ContactScreen()));
             }),
             _SettingsTile(
               icon: isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
