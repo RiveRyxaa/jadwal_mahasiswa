@@ -3,7 +3,7 @@ BLUEPRINT APLIKASI CAMPUSFLOW
 =============================
 
 NAMA APLIKASI:
-CampusFlow (Contoh Nama)
+CampusFlow
 
 JENIS APLIKASI:
 Aplikasi Jadwal Kuliah Pintar & Produktivitas Mahasiswa

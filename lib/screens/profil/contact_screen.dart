@@ -187,7 +187,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   const SizedBox(height: 16),
 
                   // Email Kampus
-                  _buildLabel(context, 'Email Kampus'),
+                  _buildLabel(context, 'Email Anda'),
                   const SizedBox(height: 6),
                   TextFormField(
                     controller: _emailController,

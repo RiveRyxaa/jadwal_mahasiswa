@@ -20,6 +20,7 @@ class AuthProvider extends ChangeNotifier {
   final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+
   // ─── Auto Login ───
   Future<bool> tryAutoLogin() async {
     // Check Firebase auth state first
