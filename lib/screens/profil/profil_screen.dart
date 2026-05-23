@@ -87,18 +87,18 @@ class _ProfilScreenState extends State<ProfilScreen> {
             }),
             _SettingsTile(
               icon: isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-              title: isDark ? 'Light Mode' : 'Dark Mode',
+              title: isDark ? 'Mode Terang' : 'Mode Gelap',
               trailing: Switch(value: themeProv.isDarkMode, onChanged: (_) => themeProv.toggleTheme(), activeTrackColor: AppColors.primaryPurple),
               onTap: () => themeProv.toggleTheme(),
             ),
             const SizedBox(height: 8),
-            _SettingsTile(icon: Icons.logout, title: 'Logout', iconColor: AppColors.error, titleColor: AppColors.error, onTap: () {
+            _SettingsTile(icon: Icons.logout, title: 'Keluar', iconColor: AppColors.error, titleColor: AppColors.error, onTap: () {
               showDialog(context: context, builder: (ctx) => AlertDialog(
-                title: const Text('Logout'),
+                title: const Text('Keluar'),
                 content: const Text('Yakin ingin keluar?'),
                 actions: [
                   TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-                  TextButton(onPressed: () { Navigator.pop(ctx); auth.logout(); Navigator.of(context).pushReplacementNamed('/login'); }, child: const Text('Logout', style: TextStyle(color: AppColors.error))),
+                  TextButton(onPressed: () { Navigator.pop(ctx); auth.logout(); Navigator.of(context).pushReplacementNamed('/login'); }, child: const Text('Keluar', style: TextStyle(color: AppColors.error))),
                 ],
               ));
             }),

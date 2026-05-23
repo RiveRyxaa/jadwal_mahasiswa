@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/tugas_provider.dart';
 import '../../models/tugas_model.dart';
 import 'tambah_tugas_screen.dart';
+import '../notification/notification_screen.dart';
 
 class TugasScreen extends StatelessWidget {
   const TugasScreen({super.key});
@@ -50,13 +51,8 @@ class TugasScreen extends StatelessWidget {
                 const Spacer(),
                 GestureDetector(
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Notifications coming soon!'),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        duration: const Duration(seconds: 2),
-                      ),
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const NotificationScreen()),
                     );
                   },
                   child: Container(
@@ -74,27 +70,27 @@ class TugasScreen extends StatelessWidget {
               const SizedBox(height: 28),
 
               // ── Header ──
-              Text('My Tasks', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+              Text('Tugas Saya', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
-              Text('Stay organized and track your academic progress.', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
+              Text('Tetap terorganisir dan pantau progres akademikmu.', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
 
               const SizedBox(height: 24),
 
               // ── Summary Cards ──
-              _SummaryCard(label: 'URGENT', count: urgent, color: const Color(0xFFEF4444), bgColor: const Color(0xFFFEE2E2), isDark: isDark),
+              _SummaryCard(label: 'MENDESAK', count: urgent, color: const Color(0xFFEF4444), bgColor: const Color(0xFFFEE2E2), isDark: isDark),
               const SizedBox(height: 10),
-              _SummaryCard(label: 'IN PROGRESS', count: inProgress, color: AppColors.primaryPurple, bgColor: const Color(0xFFF3EEFA), isDark: isDark),
+              _SummaryCard(label: 'SEDANG DIKERJAKAN', count: inProgress, color: AppColors.primaryPurple, bgColor: const Color(0xFFF3EEFA), isDark: isDark),
               const SizedBox(height: 10),
-              _SummaryCard(label: 'COMPLETED', count: completed, color: const Color(0xFF10B981), bgColor: const Color(0xFFD1FAE5), isDark: isDark),
+              _SummaryCard(label: 'SELESAI', count: completed, color: const Color(0xFF10B981), bgColor: const Color(0xFFD1FAE5), isDark: isDark),
 
               const SizedBox(height: 32),
 
               // ── High Priority ──
               if (highTasks.isNotEmpty) ...[
-                _PriorityHeader(label: 'High Priority', color: AppColors.priorityHigh),
+                _PriorityHeader(label: 'Prioritas Tinggi', color: AppColors.priorityHigh),
                 const SizedBox(height: 12),
                 ...highTasks.map((t) => _TaskTile(
-                  tugas: t, isDark: isDark, badgeColor: AppColors.priorityHigh, badgeText: 'HIGH',
+                  tugas: t, isDark: isDark, badgeColor: AppColors.priorityHigh, badgeText: 'TINGGI',
                   onToggle: () => tugasProv.toggleStatus(userId, t.id),
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TambahTugasScreen(tugas: t))),
                   onDelete: () => _confirmDelete(context, userId, t, tugasProv),
@@ -104,10 +100,10 @@ class TugasScreen extends StatelessWidget {
 
               // ── Medium Priority ──
               if (medTasks.isNotEmpty) ...[
-                _PriorityHeader(label: 'Medium Priority', color: AppColors.priorityMedium),
+                _PriorityHeader(label: 'Prioritas Sedang', color: AppColors.priorityMedium),
                 const SizedBox(height: 12),
                 ...medTasks.map((t) => _TaskTile(
-                  tugas: t, isDark: isDark, badgeColor: AppColors.priorityMedium, badgeText: 'MEDIUM',
+                  tugas: t, isDark: isDark, badgeColor: AppColors.priorityMedium, badgeText: 'SEDANG',
                   onToggle: () => tugasProv.toggleStatus(userId, t.id),
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TambahTugasScreen(tugas: t))),
                   onDelete: () => _confirmDelete(context, userId, t, tugasProv),
@@ -117,10 +113,10 @@ class TugasScreen extends StatelessWidget {
 
               // ── Low Priority ──
               if (lowTasks.isNotEmpty) ...[
-                _PriorityHeader(label: 'Low Priority', color: AppColors.priorityLow),
+                _PriorityHeader(label: 'Prioritas Rendah', color: AppColors.priorityLow),
                 const SizedBox(height: 12),
                 ...lowTasks.map((t) => _TaskTile(
-                  tugas: t, isDark: isDark, badgeColor: AppColors.priorityLow, badgeText: 'LOW',
+                  tugas: t, isDark: isDark, badgeColor: AppColors.priorityLow, badgeText: 'RENDAH',
                   onToggle: () => tugasProv.toggleStatus(userId, t.id),
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TambahTugasScreen(tugas: t))),
                   onDelete: () => _confirmDelete(context, userId, t, tugasProv),
@@ -130,10 +126,10 @@ class TugasScreen extends StatelessWidget {
 
               // ── Completed section ──
               if (tugasProv.tugasSelesai.isNotEmpty) ...[
-                _PriorityHeader(label: 'Completed', color: AppColors.success),
+                _PriorityHeader(label: 'Selesai', color: AppColors.success),
                 const SizedBox(height: 12),
                 ...tugasProv.tugasSelesai.take(3).map((t) => _TaskTile(
-                  tugas: t, isDark: isDark, badgeColor: AppColors.success, badgeText: 'DONE',
+                  tugas: t, isDark: isDark, badgeColor: AppColors.success, badgeText: 'SELESAI',
                   onToggle: () => tugasProv.toggleStatus(userId, t.id),
                   onTap: () {},
                   onDelete: () => _confirmDelete(context, userId, t, tugasProv),
@@ -146,9 +142,9 @@ class TugasScreen extends StatelessWidget {
                 Center(child: Column(children: [
                   Icon(Icons.task_alt, size: 64, color: isDark ? AppColors.darkTextSecondary : AppColors.textHint),
                   const SizedBox(height: 12),
-                  Text('No tasks yet', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
+                  Text('Belum ada tugas', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
                   const SizedBox(height: 4),
-                  Text('Tap + to add your first task', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
+                  Text('Ketuk + untuk menambah tugas', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
                 ])),
               ],
 
@@ -279,7 +275,7 @@ class _TaskTile extends StatelessWidget {
             Row(children: [
               Icon(Icons.calendar_today, size: 12, color: isOverdue ? AppColors.error : (isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
               const SizedBox(width: 4),
-              Text(isOverdue ? 'Overdue • $deadlineStr' : deadlineStr, style: TextStyle(fontSize: 11, color: isOverdue ? AppColors.error : (isDark ? AppColors.darkTextSecondary : AppColors.textHint), fontWeight: isOverdue ? FontWeight.w600 : FontWeight.normal)),
+              Text(isOverdue ? 'Terlambat • $deadlineStr' : deadlineStr, style: TextStyle(fontSize: 11, color: isOverdue ? AppColors.error : (isDark ? AppColors.darkTextSecondary : AppColors.textHint), fontWeight: isOverdue ? FontWeight.w600 : FontWeight.normal)),
             ]),
           ])),
         ]),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/tugas_model.dart';
+import '../services/notification_service.dart';
 
 class TugasProvider extends ChangeNotifier {
   List<TugasModel> _tugasList = [];
@@ -55,6 +56,7 @@ class TugasProvider extends ChangeNotifier {
     _tugasList.add(newTugas);
     _sortTugas();
     await _saveTugas(userId);
+    await NotificationService().scheduleTugasNotifications(_tugasList);
     notifyListeners();
   }
 
@@ -65,6 +67,7 @@ class TugasProvider extends ChangeNotifier {
       _tugasList[index] = tugas;
       _sortTugas();
       await _saveTugas(userId);
+      await NotificationService().scheduleTugasNotifications(_tugasList);
       notifyListeners();
     }
   }
@@ -73,6 +76,7 @@ class TugasProvider extends ChangeNotifier {
   Future<void> deleteTugas(String userId, String tugasId) async {
     _tugasList.removeWhere((t) => t.id == tugasId);
     await _saveTugas(userId);
+    await NotificationService().scheduleTugasNotifications(_tugasList);
     notifyListeners();
   }
 
@@ -87,6 +91,7 @@ class TugasProvider extends ChangeNotifier {
             : StatusTugas.aktif,
       );
       await _saveTugas(userId);
+      await NotificationService().scheduleTugasNotifications(_tugasList);
       notifyListeners();
     }
   }

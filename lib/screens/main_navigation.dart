@@ -64,7 +64,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 _NavItem(
                   icon: Icons.home_outlined,
                   activeIcon: Icons.home_rounded,
-                  label: 'Home',
+                  label: 'Beranda',
                   isSelected: _currentIndex == 0,
                   onTap: () => _setTab(0),
                   isDark: isDark,
@@ -72,7 +72,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 _NavItem(
                   icon: Icons.calendar_month_outlined,
                   activeIcon: Icons.calendar_month_rounded,
-                  label: 'Schedule',
+                  label: 'Jadwal',
                   isSelected: _currentIndex == 1,
                   onTap: () => _setTab(1),
                   isDark: isDark,
@@ -80,7 +80,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 _NavItem(
                   icon: Icons.check_circle_outline,
                   activeIcon: Icons.check_circle_rounded,
-                  label: 'Tasks',
+                  label: 'Tugas',
                   isSelected: _currentIndex == 2,
                   onTap: () => _setTab(2),
                   isDark: isDark,
@@ -88,7 +88,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 _NavItem(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person_rounded,
-                  label: 'Profile',
+                  label: 'Profil',
                   isSelected: _currentIndex == 3,
                   onTap: () => _setTab(3),
                   isDark: isDark,

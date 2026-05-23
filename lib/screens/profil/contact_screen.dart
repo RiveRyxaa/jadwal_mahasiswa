@@ -200,7 +200,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   _buildLabel(context, 'Subjek'),
                   const SizedBox(height: 6),
                   DropdownButtonFormField<String>(
-                    value: _selectedSubject,
+                    initialValue: _selectedSubject,
                     isExpanded: true,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

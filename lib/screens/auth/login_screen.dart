@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Academic precision for modern students.',
+                      'Teman setia kuliah mahasiswa modern.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: isDark
                                 ? AppColors.darkTextSecondary
@@ -151,8 +151,8 @@ class _LoginScreenState extends State<LoginScreen>
                             // Email
                             CustomTextField(
                               controller: _emailController,
-                              labelText: 'Email Address',
-                              hintText: 'student@university.edu',
+                              labelText: 'Alamat Email',
+                              hintText: 'mahasiswa@universitas.ac.id',
                               prefixIcon: Icons.email_outlined,
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
@@ -190,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     );
                                   },
                                   child: Text(
-                                    'Forgot Password?',
+                                    'Lupa Password?',
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall
@@ -238,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                             // Login Button
                             CustomButton(
-                              text: 'Login',
+                              text: 'Masuk',
                               onPressed: _handleLogin,
                               isLoading: authProvider.isLoading,
                             ),
@@ -258,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 16),
                                   child: Text(
-                                    'OR CONTINUE WITH',
+                                    'ATAU LANJUTKAN DENGAN',
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall
@@ -341,7 +341,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                     // Register Link
                     Text(
-                      'New to the platform?',
+                      'Belum punya akun?',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: isDark
                                 ? AppColors.darkTextSecondary
@@ -371,7 +371,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
                         child: const Text(
-                          'Register',
+                          'Daftar',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -383,7 +383,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                     // Footer
                     Text(
-                      '© 2026 SobatKuliah. All rights reserved.',
+                      '© 2026 SobatKuliah. Hak cipta dilindungi.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: isDark
                                 ? AppColors.darkTextSecondary

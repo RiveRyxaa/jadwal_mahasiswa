@@ -76,9 +76,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Create Account', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryPurple)),
+              Text('Buat Akun', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryPurple)),
               const SizedBox(height: 6),
-              Text('Join SobatKuliah and organize your academic life', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary), textAlign: TextAlign.center),
+              Text('Bergabung dengan SobatKuliah dan atur kehidupan akademikmu', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary), textAlign: TextAlign.center),
               const SizedBox(height: 32),
               Container(
                 padding: const EdgeInsets.all(28),
@@ -94,7 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       CustomTextField(controller: _namaController, labelText: 'Nama Lengkap', hintText: 'Masukkan nama lengkap', prefixIcon: Icons.person_outline, validator: (v) => v == null || v.isEmpty ? 'Nama tidak boleh kosong' : null),
                       const SizedBox(height: 16),
-                      CustomTextField(controller: _emailController, labelText: 'Email', hintText: 'student@university.edu', prefixIcon: Icons.email_outlined, keyboardType: TextInputType.emailAddress, validator: (v) { if (v == null || v.isEmpty) return 'Email tidak boleh kosong'; if (!v.contains('@')) return 'Format email tidak valid'; return null; }),
+                      CustomTextField(controller: _emailController, labelText: 'Email', hintText: 'mahasiswa@universitas.ac.id', prefixIcon: Icons.email_outlined, keyboardType: TextInputType.emailAddress, validator: (v) { if (v == null || v.isEmpty) return 'Email tidak boleh kosong'; if (!v.contains('@')) return 'Format email tidak valid'; return null; }),
                       const SizedBox(height: 16),
                       CustomTextField(controller: _passwordController, labelText: 'Password', hintText: 'Minimal 6 karakter', prefixIcon: Icons.lock_outline, obscureText: _obscurePassword, suffixIcon: IconButton(icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20), onPressed: () => setState(() => _obscurePassword = !_obscurePassword)), validator: (v) { if (v == null || v.isEmpty) return 'Password tidak boleh kosong'; if (v.length < 6) return 'Password minimal 6 karakter'; return null; }),
                       const SizedBox(height: 16),
@@ -145,8 +145,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 24),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text('Already have an account? ', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
-                GestureDetector(onTap: () => Navigator.of(context).pop(), child: Text('Login', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.primaryPurple, fontWeight: FontWeight.w600))),
+                Text('Sudah punya akun? ', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
+                GestureDetector(onTap: () => Navigator.of(context).pop(), child: Text('Masuk', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.primaryPurple, fontWeight: FontWeight.w600))),
               ]),
               const SizedBox(height: 20),
             ],

@@ -8,10 +8,12 @@ import 'providers/tugas_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_navigation.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await NotificationService().init();
   runApp(const SobatKuliahApp());
 }
 
@@ -93,6 +95,11 @@ class _SplashScreenState extends State<SplashScreen>
         jadwalProv.loadJadwal(userId),
         tugasProv.loadTugas(userId),
       ]);
+
+      // Schedule notifications for jadwal & tugas
+      final notifService = NotificationService();
+      await notifService.scheduleJadwalNotifications(jadwalProv.jadwalList);
+      await notifService.scheduleTugasNotifications(tugasProv.tugasList);
     }
 
     await Future.delayed(const Duration(milliseconds: 1500));
@@ -140,7 +147,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Academic precision for modern students.',
+                  'Teman setia kuliah mahasiswa modern.',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 14,

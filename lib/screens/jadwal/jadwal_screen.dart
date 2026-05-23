@@ -6,6 +6,7 @@ import '../../models/jadwal_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/jadwal_provider.dart';
 import 'tambah_jadwal_screen.dart';
+import '../notification/notification_screen.dart';
 
 class JadwalScreen extends StatefulWidget {
   const JadwalScreen({super.key});
@@ -95,13 +96,8 @@ class _JadwalScreenState extends State<JadwalScreen> {
                   // Notification bell
                   GestureDetector(
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('Notifications coming soon!'),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          duration: const Duration(seconds: 2),
-                        ),
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const NotificationScreen()),
                       );
                     },
                     child: Container(
@@ -136,7 +132,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Weekly Schedule',
+                          'Jadwal Mingguan',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
@@ -168,7 +164,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
                           Icon(Icons.add, color: Colors.white, size: 16),
                           SizedBox(width: 4),
                           Text(
-                            'Add Class',
+                            'Tambah Kelas',
                             style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
                           ),
                         ],
@@ -271,7 +267,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    "Today's Lectures",
+                    "Perkuliahan Hari Ini",
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                   ),
                 ],
@@ -360,7 +356,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No classes scheduled',
+            'Belum ada jadwal',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                   fontWeight: FontWeight.w600,
@@ -368,7 +364,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Tap "+ Add Class" to add a lecture',
+            'Ketuk "+ Tambah Kelas" untuk menambah jadwal',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: isDark ? AppColors.darkTextSecondary : AppColors.textHint,
                 ),
@@ -399,7 +395,7 @@ class _JadwalScreenState extends State<JadwalScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            lastTime != null ? 'No classes after $lastTime' : 'No more classes',
+            lastTime != null ? 'Tidak ada kelas setelah $lastTime' : 'Tidak ada kelas lagi',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                 ),
@@ -549,7 +545,7 @@ class _LectureCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
-                            'HAPPENING NOW',
+                            'SEDANG BERLANGSUNG',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 9,
@@ -618,7 +614,7 @@ class _LectureCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Live',
+                              'Langsung',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,

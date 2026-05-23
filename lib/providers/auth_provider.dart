@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import '../models/user_model.dart';
@@ -16,7 +15,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoggedIn => _currentUser != null;
   String? get error => _error;
 
-  final _uuid = const Uuid();
+
   final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 

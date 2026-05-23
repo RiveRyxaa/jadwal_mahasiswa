@@ -10,6 +10,7 @@ import '../../models/tugas_model.dart';
 import '../main_navigation.dart';
 import '../jadwal/tambah_jadwal_screen.dart';
 import '../tugas/tambah_tugas_screen.dart';
+import '../notification/notification_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -81,8 +82,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(child: _StatCard(
                   icon: Icons.menu_book_rounded,
                   value: totalTugas > 0 ? ((selesai / totalTugas) * 4).toStringAsFixed(2) : '0.00',
-                  label: 'Cum. GPA • ${DateFormat('yyyy').format(now)}',
-                  badge: 'ACADEMIC AVG',
+                  label: 'IPK • ${DateFormat('yyyy').format(now)}',
+                  badge: 'RATA-RATA AKADEMIK',
                   isDark: isDark,
                 )),
                 const SizedBox(width: 12),
@@ -92,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     icon: Icons.check_circle_outline,
                     value: '$selesai/$totalTugas',
                     label: '',
-                    badge: 'TASKS DONE',
+                    badge: 'TUGAS SELESAI',
                     isDark: isDark,
                   ),
                 )),
@@ -101,16 +102,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // ── Today's Schedule ──
               Row(children: [
-                Text("Today's Schedule", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                Text("Jadwal Hari Ini", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => MainNavigation.switchTab(context, 1),
-                  child: const Text('View All', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
+                  child: const Text('Lihat Semua', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
                 ),
               ]),
               const SizedBox(height: 14),
               if (todayJadwal.isEmpty)
-                _EmptyBox(text: 'No classes today', icon: Icons.event_available, isDark: isDark)
+                _EmptyBox(text: 'Tidak ada kelas hari ini', icon: Icons.event_available, isDark: isDark)
               else
                 ...todayJadwal.map((j) {
                   final sp = j.jamMulai.split(':');
@@ -157,7 +158,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         if (isLive) Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6)),
-                          child: const Text('LIVE', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                          child: const Text('BERLANGSUNG', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
                         ),
                       ]),
                     ),
@@ -168,7 +169,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // ── Upcoming Tasks ──
               Row(children: [
-                Text('Upcoming Tasks', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                Text('Tugas Mendatang', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () {
@@ -185,7 +186,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ]),
               const SizedBox(height: 14),
               if (tugasProv.tugasDeadlineTerdekat.isEmpty)
-                _EmptyBox(text: 'No upcoming tasks', icon: Icons.task_alt, isDark: isDark)
+                _EmptyBox(text: 'Belum ada tugas', icon: Icons.task_alt, isDark: isDark)
               else
                 ...tugasProv.tugasDeadlineTerdekat.take(3).map((t) => _TaskItem(
                   tugas: t,
@@ -215,10 +216,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.divider),
                     ),
                     child: Column(children: [
-                      Text('You have ${tugasProv.tugasAktif.length - 3} more tasks later this month.',
+                      Text('Kamu punya ${tugasProv.tugasAktif.length - 3} tugas lagi bulan ini.',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary), textAlign: TextAlign.center),
                       const SizedBox(height: 6),
-                      const Text('View full roadmap', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
+                      const Text('Lihat semua tugas', style: TextStyle(color: AppColors.primaryPurple, fontSize: 13, fontWeight: FontWeight.w600)),
                     ]),
                   ),
                 ),
@@ -256,13 +257,8 @@ class _TopBar extends StatelessWidget {
       const Spacer(),
       GestureDetector(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Notifications coming soon!'),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              duration: const Duration(seconds: 2),
-            ),
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const NotificationScreen()),
           );
         },
         child: Container(
@@ -298,11 +294,11 @@ class _NextClassCard extends StatelessWidget {
           boxShadow: [BoxShadow(color: AppColors.primaryPurple.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 8))],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _badge('NEXT CLASS'),
+          _badge('KELAS BERIKUTNYA'),
           const SizedBox(height: 12),
-          const Text('No upcoming classes', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text('Tidak ada kelas mendatang', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text('Add your schedule to get started', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13)),
+          Text('Tambahkan jadwal untuk memulai', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13)),
         ]),
       );
     }
@@ -319,7 +315,7 @@ class _NextClassCard extends StatelessWidget {
         boxShadow: [BoxShadow(color: AppColors.primaryPurple.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 8))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _badge('NEXT CLASS'),
+        _badge('KELAS BERIKUTNYA'),
         const SizedBox(height: 14),
         Text(nextClass.namaMatkul, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
@@ -333,7 +329,7 @@ class _NextClassCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
-            child: Text('Starts in ${hours}h ${minutes}m', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+            child: Text('Mulai dalam ${hours}j ${minutes}m', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
           ),
           const Spacer(),
           GestureDetector(
@@ -342,7 +338,7 @@ class _NextClassCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('View Details', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13, fontWeight: FontWeight.w500)),
+                Text('Lihat Detail', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13, fontWeight: FontWeight.w500)),
                 const SizedBox(width: 4),
                 Icon(Icons.arrow_forward_rounded, color: Colors.white.withValues(alpha: 0.9), size: 16),
               ]),
@@ -410,7 +406,7 @@ class _TaskItem extends StatelessWidget {
     final deadlineStr = DateFormat('EEEE, h:mm a').format(tugas.deadline);
     final isUrgent = tugas.prioritas == Prioritas.tinggi;
     final diff = tugas.deadline.difference(DateTime.now());
-    final badgeText = isUrgent ? 'URGENT' : (diff.inDays <= 7 ? 'THIS WEEK' : 'UPCOMING');
+    final badgeText = isUrgent ? 'MENDESAK' : (diff.inDays <= 7 ? 'MINGGU INI' : 'MENDATANG');
     final badgeColor = isUrgent ? AppColors.error : (diff.inDays <= 7 ? AppColors.warning : AppColors.primaryPurple);
     final isCompleted = tugas.status == StatusTugas.selesai;
 

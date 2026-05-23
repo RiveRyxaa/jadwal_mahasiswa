@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/jadwal_model.dart';
+import '../services/notification_service.dart';
 
 class JadwalProvider extends ChangeNotifier {
   List<JadwalModel> _jadwalList = [];
@@ -57,6 +58,7 @@ class JadwalProvider extends ChangeNotifier {
     _jadwalList.add(newJadwal);
     _sortJadwal();
     await _saveJadwal(userId);
+    await NotificationService().scheduleJadwalNotifications(_jadwalList);
     notifyListeners();
   }
 
@@ -67,6 +69,7 @@ class JadwalProvider extends ChangeNotifier {
       _jadwalList[index] = jadwal;
       _sortJadwal();
       await _saveJadwal(userId);
+      await NotificationService().scheduleJadwalNotifications(_jadwalList);
       notifyListeners();
     }
   }
@@ -75,6 +78,7 @@ class JadwalProvider extends ChangeNotifier {
   Future<void> deleteJadwal(String userId, String jadwalId) async {
     _jadwalList.removeWhere((j) => j.id == jadwalId);
     await _saveJadwal(userId);
+    await NotificationService().scheduleJadwalNotifications(_jadwalList);
     notifyListeners();
   }
 
