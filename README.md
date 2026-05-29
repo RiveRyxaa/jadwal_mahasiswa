@@ -1,6 +1,5 @@
 <div align="center">
-  <!-- Taruh gambar banner aplikasi di sini -->
-  <img src="https://via.placeholder.com/1000x300/0d1117/00FF41?text=SobatKuliah+(CampusFlow)" width="100%" alt="Banner SobatKuliah" />
+  <img src="assets/image/banner.png" width="100%" alt="Banner SobatKuliah" />
 </div>
 
 # 🎓 SobatKuliah (Smart College Schedule & Productivity)
