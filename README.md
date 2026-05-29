@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/image/banner.png" width="100%" alt="Banner SobatKuliah" />
+  <img src="assets/banner.png" width="100%" alt="Banner SobatKuliah" />
 </div>
 
 # 🎓 SobatKuliah (Smart College Schedule & Productivity)
