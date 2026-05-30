@@ -284,54 +284,25 @@ class _LoginScreenState extends State<LoginScreen>
                             const SizedBox(height: 20),
 
                             // Social Buttons
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SocialButton(
-                                    text: 'Google',
-                                    icon: Icons.g_mobiledata_rounded,
-                                    onPressed: () async {
-                                      final auth = context.read<AuthProvider>();
-                                      final success = await auth.loginWithGoogle();
-                                      if (success && context.mounted) {
-                                        Navigator.of(context).pushReplacementNamed('/home');
-                                      } else if (context.mounted && auth.error != null) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(auth.error!),
-                                            backgroundColor: AppColors.error,
-                                            behavior: SnackBarBehavior.floating,
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: SocialButton(
-                                    text: 'SSO',
-                                    icon: Icons.key_rounded,
-                                    onPressed: () async {
-                                      final auth = context.read<AuthProvider>();
-                                      final success = await auth.loginWithGoogle();
-                                      if (success && context.mounted) {
-                                        Navigator.of(context).pushReplacementNamed('/home');
-                                      } else if (context.mounted && auth.error != null) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(auth.error!),
-                                            backgroundColor: AppColors.error,
-                                            behavior: SnackBarBehavior.floating,
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
+                            SocialButton(
+                              text: 'Google',
+                              icon: Icons.g_mobiledata_rounded,
+                              onPressed: () async {
+                                final auth = context.read<AuthProvider>();
+                                final success = await auth.loginWithGoogle();
+                                if (success && context.mounted) {
+                                  Navigator.of(context).pushReplacementNamed('/home');
+                                } else if (context.mounted && auth.error != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(auth.error!),
+                                      backgroundColor: AppColors.error,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),
