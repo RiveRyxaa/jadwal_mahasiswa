@@ -1,12 +1,12 @@
 
-BLUEPRINT APLIKASI CAMPUSFLOW
-=============================
+BLUEPRINT APLIKASI SOBATKULIAH
+===============================
 
 NAMA APLIKASI:
-CampusFlow
+SobatKuliah
 
 JENIS APLIKASI:
-Aplikasi Jadwal Kuliah Pintar & Produktivitas Mahasiswa
+Aplikasi Mobile Jadwal Kuliah Pintar & Produktivitas Mahasiswa (Android)
 
 TARGET PENGGUNA:
 - Mahasiswa universitas
@@ -18,71 +18,85 @@ TARGET PENGGUNA:
 ==================================================
 
 Aplikasi ini membantu mahasiswa untuk mengatur:
-- Jadwal kuliah
-- Deadline tugas
-- Reminder kegiatan
+- Jadwal kuliah mingguan
+- Deadline tugas dengan prioritas
+- Notifikasi pengingat otomatis (15 menit & tepat waktu masuk kelas)
+- Pengingat deadline tugas (1 hari, 3 jam, 1 jam sebelum)
 - Produktivitas harian
 
 Tujuan utama:
-Membantu mahasiswa menjadi lebih terorganisir dan tidak lupa jadwal atau tugas.
+Membantu mahasiswa menjadi lebih terorganisir dan tidak lupa jadwal atau tugas
+dengan sistem notifikasi pintar yang berjalan di latar belakang.
 
 ==================================================
-2. FITUR UTAMA (VERSI MVP)
+2. FITUR UTAMA (SUDAH DIIMPLEMENTASI)
 ==================================================
 
-[1] AUTENTIKASI
----------------
+[1] AUTENTIKASI (Firebase Auth)
+-------------------------------
 Fitur:
-- Register akun
-- Login akun
-- Logout
-- Lupa password
+- Register akun (email/password)
+- Login akun (email/password)
+- Login dengan Google
+- Lupa password (reset via email Firebase SMTP)
+- Auto login (session tersimpan)
+- Keluar (logout)
 
 Data pengguna:
 - Nama lengkap
 - Email
-- Password
+- Password (terenkripsi Firebase)
 - Universitas
 - Jurusan
 
+Catatan:
+- SMTP dikonfigurasi melalui Firebase Console
+- Menggunakan Gmail App Password untuk pengiriman email
+- Link reset password masuk ke inbox utama (bukan spam)
+
 ==================================================
 
-[2] DASHBOARD
--------------
+[2] DASHBOARD (Beranda)
+-----------------------
 Menampilkan:
-- Jadwal hari ini
-- Kelas berikutnya
-- Deadline tugas terdekat
-- Countdown menuju kelas berikutnya
+- Kelas berikutnya dengan countdown waktu
+- Jadwal hari ini (dengan badge BERLANGSUNG jika sedang berjalan)
+- Tugas mendatang (3 terdekat)
+- Statistik: IPK rata-rata & jumlah tugas selesai
+- Tombol notifikasi → buka halaman notifikasi
+- Navigasi cepat ke semua fitur
 
-Contoh:
+Contoh tampilan:
 --------------------------------
-Kelas Berikutnya:
+KELAS BERIKUTNYA
 Basis Data
 09:00 - Ruang A204
-
-Dimulai dalam:
-1 jam 12 menit
+Mulai dalam 1j 12m
 --------------------------------
 
 ==================================================
 
 [3] MANAJEMEN JADWAL KULIAH
----------------------------
+----------------------------
 Fitur:
 - Tambah jadwal kuliah
 - Edit jadwal
-- Hapus jadwal
-- Tampilan jadwal mingguan
+- Hapus jadwal (long press + konfirmasi)
+- Tampilan jadwal mingguan (Senin-Sabtu)
+- Selector hari dengan tanggal
+- Badge "SEDANG BERLANGSUNG" untuk kelas aktif
+- Kode mata kuliah otomatis
 
 Input:
 - Nama mata kuliah
 - Nama dosen
-- Hari
-- Jam mulai
-- Jam selesai
+- Hari (dropdown: Senin-Sabtu)
+- Jam mulai (time picker)
+- Jam selesai (time picker)
 - Ruangan
-- Catatan
+- Catatan (opsional)
+
+Penyimpanan: SharedPreferences (JSON lokal)
 
 ==================================================
 
@@ -90,40 +104,88 @@ Input:
 -----------------
 Fitur:
 - Tambah tugas
-- Atur deadline
-- Tandai tugas selesai
-- Label prioritas
+- Edit tugas
+- Hapus tugas (long press + konfirmasi)
+- Atur deadline (date & time picker)
+- Tandai tugas selesai/aktif (toggle checkbox)
+- Label prioritas dengan warna
+- Pengelompokan berdasarkan prioritas
+- Badge status: TINGGI, SEDANG, RENDAH, SELESAI, TERLAMBAT
 
 Level prioritas:
-- Tinggi
-- Sedang
-- Rendah
+- Tinggi (merah)
+- Sedang (oranye)
+- Rendah (hijau)
+
+Statistik:
+- MENDESAK (jumlah tugas prioritas tinggi/terlambat)
+- SEDANG DIKERJAKAN (jumlah tugas aktif)
+- SELESAI (jumlah tugas selesai)
+
+Penyimpanan: SharedPreferences (JSON lokal)
 
 ==================================================
 
-[5] SISTEM REMINDER
--------------------
-Notifikasi:
-- Kelas dimulai 30 menit lagi
-- Deadline tugas besok
-- Event kampus penting
+[5] SISTEM NOTIFIKASI (flutter_local_notifications)
+----------------------------------------------------
+Notifikasi push otomatis (muncul di layar HP meskipun app tertutup):
 
-Jenis reminder:
-- Notifikasi browser
-- Email reminder
+Jadwal Kuliah:
+- 📚 15 menit sebelum kelas dimulai
+- 🔔 Tepat saat waktu kelas dimulai
+- Repeat otomatis setiap minggu
+
+Deadline Tugas:
+- ⏰ 1 hari sebelum deadline
+- 🔴 3 jam sebelum deadline (khusus prioritas tinggi)
+- 🚨 1 jam sebelum deadline
+
+Fitur teknis:
+- Notifikasi dijadwalkan ulang otomatis saat tambah/edit/hapus data
+- Tetap aktif setelah HP restart (BootReceiver)
+- Exact alarm scheduling (Android 12+)
+- Permission POST_NOTIFICATIONS (Android 13+)
+- Timezone Asia/Jakarta
+
+Halaman Notifikasi:
+- Daftar pengingat aktif berdasarkan urgensi
+- Jadwal hari ini & besok
+- Tugas terlambat, deadline hari ini, minggu ini
+- Tombol "Tandai Dibaca"
 
 ==================================================
 
-[6] DARK MODE
--------------
+[6] PROFIL & PENGATURAN
+-----------------------
+Fitur:
+- Edit profil (nama, universitas, jurusan)
+- Ganti password
+- Mode Terang / Mode Gelap (toggle switch)
+- Hubungi Kami (form kontak via email)
+- Keluar (logout dengan konfirmasi)
+
+Halaman Hubungi Kami:
+- Form: Nama, Email, Subjek (dropdown), Pesan
+- Kirim via intent email (mailto)
+- Subjek: Bug, Saran, Pertanyaan Umum, Lainnya
+
+==================================================
+
+[7] TEMA (Dark Mode / Light Mode)
+----------------------------------
 Pilihan tema:
-- Light mode
-- Dark mode
+- Mode Terang (default)
+- Mode Gelap
 
 Konsep desain:
-- Minimalis
-- Modern
-- Nyaman untuk mahasiswa
+- Modern & premium
+- Warna utama: Ungu (#6C63FF / #1B365D)
+- Glassmorphism cards
+- Animasi transisi halus
+- Google Fonts: Inter
+- Seluruh teks dalam Bahasa Indonesia
+
+Penyimpanan: SharedPreferences (otomatis tersimpan)
 
 ==================================================
 3. FITUR PENGEMBANGAN KE DEPAN
@@ -138,14 +200,14 @@ Contoh:
 ==================================================
 
 [2] SCAN JADWAL DARI FOTO
--------------------------
+--------------------------
 Fitur:
 Upload foto jadwal lalu otomatis diubah menjadi data jadwal.
 
 ==================================================
 
 [3] SHARE JADWAL TEMAN
-----------------------
+-----------------------
 Fitur:
 - Lihat jadwal teman
 - Atur belajar kelompok
@@ -153,187 +215,312 @@ Fitur:
 ==================================================
 
 [4] PETA KAMPUS
----------------
+----------------
 Fitur:
 - Lokasi gedung
 - Navigasi ruangan
 - Pencarian kelas
 
 ==================================================
+
+[5] SINKRONISASI CLOUD
+-----------------------
+Fitur:
+- Backup data ke Firebase/Cloud
+- Sinkronisasi antar perangkat
+- Restore data saat ganti HP
+
+==================================================
 4. TEKNOLOGI YANG DIGUNAKAN
 ==================================================
 
-FRONTEND:
-- HTML
-- CSS
-- JavaScript
-ATAU
-- React.js
+FRAMEWORK:
+- Flutter (Dart)
+- Aplikasi native Android
 
-BACKEND:
-- Node.js
-- Express.js
+STATE MANAGEMENT:
+- Provider (ChangeNotifier)
 
-DATABASE:
-- MongoDB
-ATAU
-- Supabase
+AUTENTIKASI:
+- Firebase Authentication
+- Google Sign-In
+- Firebase SMTP (reset password via email)
 
-DEPLOYMENT:
-- Render
-- Vercel
+DATABASE LOKAL:
+- SharedPreferences (JSON encoding)
+
+NOTIFIKASI:
+- flutter_local_notifications
+- timezone (Asia/Jakarta)
+- Android scheduled notifications
+
+DEPENDENCIES:
+- firebase_core
+- firebase_auth
+- google_sign_in
+- provider
+- shared_preferences
+- flutter_local_notifications
+- timezone
+- intl
+- google_fonts
+- uuid
+
+BUILD & DEPLOYMENT:
+- Flutter build APK (debug/release)
+- Install via USB (adb)
+- GitHub repository
 
 ==================================================
-5. STRUKTUR DATABASE
+5. STRUKTUR DATABASE (LOKAL)
 ==================================================
 
-TABEL USERS
-------------
-id
-nama
-email
-password
-universitas
-jurusan
-created_at
+MODEL USER
+-----------
+id (String - Firebase UID)
+nama (String)
+email (String)
+universitas (String)
+jurusan (String)
 
 ==================================================
 
-TABEL JADWAL
+MODEL JADWAL
 -------------
-id
-user_id
-nama_matkul
-nama_dosen
-hari
-jam_mulai
-jam_selesai
-ruangan
-catatan
+id (String - UUID)
+userId (String)
+namaMatkul (String)
+namaDosen (String)
+hari (String: Senin-Sabtu)
+jamMulai (String: HH:mm)
+jamSelesai (String: HH:mm)
+ruangan (String)
+catatan (String)
 
 ==================================================
 
-TABEL TUGAS
+MODEL TUGAS
 ------------
-id
-user_id
-judul
-deskripsi
-deadline
-prioritas
-status
+id (String - UUID)
+userId (String)
+judul (String)
+deskripsi (String)
+deadline (DateTime)
+prioritas (enum: tinggi/sedang/rendah)
+status (enum: aktif/selesai)
 
 ==================================================
 6. HALAMAN APLIKASI
 ==================================================
 
-[1] HALAMAN LOGIN
+[1] SPLASH SCREEN
 -----------------
-- Input email
+- Logo SobatKuliah + animasi fade
+- Tagline: "Teman setia kuliah mahasiswa modern."
+- Auto redirect ke login/beranda
+
+==================================================
+
+[2] HALAMAN LOGIN
+-----------------
+- Input alamat email
 - Input password
-- Tombol login
+- Tombol "Masuk"
+- Tombol "Lupa Password?"
+- Login dengan Google
+- Link "Belum punya akun? → Daftar"
 
 ==================================================
 
-[2] HALAMAN REGISTER
---------------------
-- Nama lengkap
-- Email
-- Password
-- Universitas
-
-==================================================
-
-[3] HALAMAN DASHBOARD
----------------------
-- Jadwal hari ini
-- Tugas terdekat
-- Countdown kelas
-
-==================================================
-
-[4] HALAMAN KALENDER
---------------------
-- Tampilan mingguan
-- Tampilan bulanan
-
-==================================================
-
-[5] HALAMAN PROFIL
+[3] HALAMAN DAFTAR
 ------------------
-- Edit profil
-- Ganti password
-- Pengaturan tema
+- Input: Nama, Email, Password, Konfirmasi Password
+- Input: Universitas, Jurusan
+- Tombol "Daftar"
+- Daftar dengan Google
+- Link "Sudah punya akun? → Masuk"
+
+==================================================
+
+[4] HALAMAN LUPA PASSWORD
+--------------------------
+- Input email
+- Kirim link reset via Firebase
+- Konfirmasi email terkirim
+- Tombol "Kembali ke Login"
+
+==================================================
+
+[5] HALAMAN BERANDA (Dashboard)
+-------------------------------
+- Top bar: Avatar, logo, tombol notifikasi 🔔
+- Card kelas berikutnya (countdown)
+- Statistik (IPK, tugas selesai)
+- Jadwal hari ini
+- Tugas mendatang
+
+==================================================
+
+[6] HALAMAN JADWAL
+------------------
+- Selector hari (Senin-Sabtu) dengan tanggal
+- Daftar perkuliahan hari terpilih
+- Tombol "Tambah Kelas"
+- Judul "Jadwal Mingguan"
+- Badge "SEDANG BERLANGSUNG"
+
+==================================================
+
+[7] HALAMAN TUGAS
+-----------------
+- Ringkasan: Mendesak, Sedang Dikerjakan, Selesai
+- Daftar tugas per prioritas (Tinggi/Sedang/Rendah)
+- Checkbox toggle selesai
+- FAB tombol tambah tugas (+)
+- Badge: TINGGI, SEDANG, RENDAH, SELESAI
+
+==================================================
+
+[8] HALAMAN NOTIFIKASI
+-----------------------
+- Daftar pengingat aktif
+- Urutan berdasarkan urgensi (mendesak → info)
+- Jadwal hari ini & besok
+- Tugas terlambat & mendekati deadline
+- Tombol "Tandai Dibaca"
+
+==================================================
+
+[9] HALAMAN PROFIL
+------------------
+- Card info profil (avatar, nama, email, universitas)
+- Edit Profil
+- Ganti Password
+- Hubungi Kami
+- Mode Terang/Gelap (toggle)
+- Keluar
+
+==================================================
+
+[10] HALAMAN HUBUNGI KAMI
+--------------------------
+- Form: Nama, Email, Subjek, Pesan
+- Kirim via email (mailto intent)
 
 ==================================================
 7. STRUKTUR PROJECT
 ==================================================
 
-project/
+SobatKuliah/
 │
-├── client/
-│   ├── html
-│   ├── css
-│   ├── js
-│
-├── server/
-│   ├── routes/
-│   ├── controllers/
+├── lib/
+│   ├── main.dart
+│   ├── config/
+│   │   └── app_theme.dart
 │   ├── models/
-│   ├── middleware/
+│   │   ├── jadwal_model.dart
+│   │   ├── tugas_model.dart
+│   │   └── user_model.dart
+│   ├── providers/
+│   │   ├── auth_provider.dart
+│   │   ├── jadwal_provider.dart
+│   │   ├── tugas_provider.dart
+│   │   └── theme_provider.dart
+│   ├── screens/
+│   │   ├── auth/
+│   │   │   ├── login_screen.dart
+│   │   │   ├── register_screen.dart
+│   │   │   └── forgot_password_screen.dart
+│   │   ├── dashboard/
+│   │   │   └── dashboard_screen.dart
+│   │   ├── jadwal/
+│   │   │   ├── jadwal_screen.dart
+│   │   │   └── tambah_jadwal_screen.dart
+│   │   ├── tugas/
+│   │   │   ├── tugas_screen.dart
+│   │   │   └── tambah_tugas_screen.dart
+│   │   ├── notification/
+│   │   │   └── notification_screen.dart
+│   │   ├── profil/
+│   │   │   ├── profil_screen.dart
+│   │   │   └── contact_screen.dart
+│   │   └── main_navigation.dart
+│   ├── services/
+│   │   └── notification_service.dart
+│   └── widgets/
+│       ├── custom_button.dart
+│       └── custom_text_field.dart
 │
-├── database/
+├── android/
+│   └── app/src/main/AndroidManifest.xml
 │
-├── public/
+├── assets/
+│   └── icon.png
 │
-└── package.json
+├── pubspec.yaml
+└── blueprint_campusflow.txt
 
 ==================================================
 8. ROADMAP PENGEMBANGAN
 ==================================================
 
-PHASE 1
--------
-- Setup project
-- Login/Register
-- Koneksi database
+PHASE 1 ✅ SELESAI
+-------------------
+- Setup project Flutter
+- Login/Register (Firebase Auth)
+- Login Google
+- Lupa Password (Firebase SMTP)
 
-PHASE 2
--------
+PHASE 2 ✅ SELESAI
+-------------------
 - CRUD jadwal kuliah
-- Dashboard utama
+- Dashboard utama (beranda)
+- Statistik akademik
 
-PHASE 3
--------
-- Tracker tugas
-- Sistem reminder
+PHASE 3 ✅ SELESAI
+-------------------
+- Tracker tugas (CRUD + prioritas)
+- Sistem notifikasi push lokal
+- Pengingat 15 menit & tepat waktu kelas
+- Pengingat deadline tugas
 
-PHASE 4
--------
-- Improve UI/UX
-- Dark mode
-- Responsive mobile
+PHASE 4 ✅ SELESAI
+-------------------
+- UI/UX premium (modern design)
+- Mode Gelap / Mode Terang
+- Seluruh teks Bahasa Indonesia
+- Halaman notifikasi
+- Halaman hubungi kami
 
-PHASE 5
--------
-- Deploy ke Render/Vercel
-- Testing
-- Optimasi performa
+PHASE 5 (RENCANA)
+------------------
+- Sinkronisasi data ke cloud
+- AI assistant untuk jadwal
+- Scan jadwal dari foto
+- Rilis ke Google Play Store
 
 ==================================================
 9. KONSEP DESAIN
 ==================================================
 
-WARNA:
-- Putih
-- Abu gelap
-- Biru modern
+WARNA UTAMA:
+- Primary: Ungu (#6C63FF)
+- Primary Dark: Navy (#1B365D)
+- Aksen: Putih, abu-abu
+- Error: Merah (#EF4444)
+- Warning: Kuning (#F59E0B)
+- Success: Hijau (#10B981)
 
 STYLE:
-- Clean
-- Modern
-- Produktif
-- Startup aesthetic
+- Modern & premium
+- Glassmorphism cards
+- Animasi transisi halus
+- Gradient headers
+- Rounded corners (16-20px)
+- Google Fonts: Inter
+
+BAHASA:
+- Seluruh antarmuka dalam Bahasa Indonesia
 
 INSPIRASI:
 - Notion
@@ -341,18 +528,34 @@ INSPIRASI:
 - Todoist
 
 ==================================================
-10. TUJUAN PROJECT
+10. ANDROID PERMISSIONS
+==================================================
+
+- POST_NOTIFICATIONS (izin tampilkan notifikasi, Android 13+)
+- RECEIVE_BOOT_COMPLETED (notifikasi aktif setelah HP restart)
+- SCHEDULE_EXACT_ALARM (jadwalkan notifikasi tepat waktu)
+- USE_EXACT_ALARM (alarm tepat, Android 12+)
+- VIBRATE (getar saat notifikasi)
+- WAKE_LOCK (layar aktif saat notifikasi)
+
+Receiver:
+- ScheduledNotificationBootReceiver (reschedule setelah reboot)
+- ScheduledNotificationReceiver (terima notifikasi terjadwal)
+
+==================================================
+11. TUJUAN PROJECT
 ==================================================
 
 Jangka Pendek:
 - Menjadi aplikasi produktivitas mahasiswa yang berguna
+- Membantu mahasiswa tidak lupa jadwal dan deadline
 
 Jangka Panjang:
-- Rilis publik
+- Rilis publik di Google Play Store
 - Support banyak kampus
-- Versi mobile app
-- AI assistant untuk jadwal
+- Sinkronisasi cloud antar perangkat
+- AI assistant untuk jadwal pintar
 
 ==================================================
-AKHIR BLUEPRINT
+AKHIR BLUEPRINT - SobatKuliah v1.0.0
 ==================================================
