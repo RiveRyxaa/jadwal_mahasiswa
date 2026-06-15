@@ -6,6 +6,7 @@ import '../../providers/theme_provider.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_button.dart';
 import 'contact_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
@@ -91,6 +92,9 @@ class _ProfilScreenState extends State<ProfilScreen> {
               trailing: Switch(value: themeProv.isDarkMode, onChanged: (_) => themeProv.toggleTheme(), activeTrackColor: AppColors.primaryPurple),
               onTap: () => themeProv.toggleTheme(),
             ),
+            _SettingsTile(icon: Icons.shield_outlined, title: 'Kebijakan Privasi', onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()));
+            }),
             const SizedBox(height: 8),
             _SettingsTile(icon: Icons.logout, title: 'Keluar', iconColor: AppColors.error, titleColor: AppColors.error, onTap: () {
               showDialog(context: context, builder: (ctx) => AlertDialog(

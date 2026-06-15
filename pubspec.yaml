@@ -1,5 +1,5 @@
 name: apk_mahasiswa
-description: "A new Flutter project."
+description: "SobatKuliah - Aplikasi manajemen jadwal kuliah dan tugas pintar untuk mahasiswa Indonesia."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

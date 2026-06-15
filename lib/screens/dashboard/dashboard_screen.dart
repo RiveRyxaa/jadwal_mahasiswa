@@ -81,9 +81,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Row(children: [
                 Expanded(child: _StatCard(
                   icon: Icons.menu_book_rounded,
-                  value: totalTugas > 0 ? ((selesai / totalTugas) * 4).toStringAsFixed(2) : '0.00',
-                  label: 'IPK • ${DateFormat('yyyy').format(now)}',
-                  badge: 'RATA-RATA AKADEMIK',
+                  value: totalTugas > 0 ? '${((selesai / totalTugas) * 100).toStringAsFixed(0)}%' : '0%',
+                  label: 'Progres ${DateFormat('yyyy').format(now)}',
+                  badge: 'PENYELESAIAN TUGAS',
                   isDark: isDark,
                 )),
                 const SizedBox(width: 12),

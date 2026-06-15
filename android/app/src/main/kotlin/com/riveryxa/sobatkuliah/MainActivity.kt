@@ -1,4 +1,4 @@
-package com.example.apk_mahasiswa
+package com.riveryxa.sobatkuliah
 
 import io.flutter.embedding.android.FlutterActivity
 

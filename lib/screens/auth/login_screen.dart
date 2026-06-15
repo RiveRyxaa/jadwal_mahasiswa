@@ -6,6 +6,7 @@ import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_button.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
+import '../profil/privacy_policy_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -353,6 +354,22 @@ class _LoginScreenState extends State<LoginScreen>
                     const SizedBox(height: 32),
 
                     // Footer
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                        );
+                      },
+                      child: Text(
+                        'Kebijakan Privasi',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.primaryPurple,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     Text(
                       '© 2026 SobatKuliah. Hak cipta dilindungi.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
