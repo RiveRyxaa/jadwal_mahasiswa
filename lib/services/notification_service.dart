@@ -47,10 +47,18 @@ class NotificationService {
 
   /// Schedule notification for jadwal (15 minutes before + at class time)
   Future<void> scheduleJadwalNotifications(List<JadwalModel> jadwalList) async {
-    // Cancel all existing jadwal notifications (IDs 1000-1999)
-    for (int i = 1000; i < 1000 + 400; i++) {
-      await _notifications.cancel(i);
+    if (!_initialized) {
+      try { await init(); } catch (_) { return; }
     }
+
+    try {
+    // Cancel all existing jadwal notifications (IDs 1000-1999)
+    // Use batch cancel instead of individual loop
+    final cancelFutures = <Future>[];
+    for (int i = 1000; i < 1000 + (jadwalList.length * 2 + 10); i++) {
+      cancelFutures.add(_notifications.cancel(i));
+    }
+    await Future.wait(cancelFutures);
 
     int notifId = 1000;
     final now = DateTime.now();
@@ -91,14 +99,24 @@ class NotificationService {
       }
       notifId++;
     }
+    } catch (e) {
+      debugPrint('Error scheduling jadwal notifications: $e');
+    }
   }
 
   /// Schedule notifications for tugas deadlines
   Future<void> scheduleTugasNotifications(List<TugasModel> tugasList) async {
-    // Cancel all existing tugas notifications (IDs 2000-2999)
-    for (int i = 2000; i < 2000 + 200; i++) {
-      await _notifications.cancel(i);
+    if (!_initialized) {
+      try { await init(); } catch (_) { return; }
     }
+
+    try {
+    // Cancel all existing tugas notifications (IDs 2000-2999)
+    final cancelFutures = <Future>[];
+    for (int i = 2000; i < 2000 + (tugasList.length * 3 + 10); i++) {
+      cancelFutures.add(_notifications.cancel(i));
+    }
+    await Future.wait(cancelFutures);
 
     int notifId = 2000;
     final now = DateTime.now();
@@ -155,6 +173,9 @@ class NotificationService {
         }
       }
       notifId++;
+    }
+    } catch (e) {
+      debugPrint('Error scheduling tugas notifications: $e');
     }
   }
 

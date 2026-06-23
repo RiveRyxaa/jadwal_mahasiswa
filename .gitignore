@@ -46,3 +46,8 @@ app.*.map.json
 
 # Firebase (contains API keys - DO NOT push to public repo)
 **/google-services.json
+
+# Signing (NEVER push keystore or key.properties)
+**/key.properties
+**/*.jks
+**/*.keystore

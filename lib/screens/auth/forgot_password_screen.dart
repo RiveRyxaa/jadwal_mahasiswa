@@ -153,13 +153,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Center(child: Text('Email Terkirim!', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
                 const SizedBox(height: 12),
                 Center(child: Text(
-                  'Link reset password telah dikirim ke ${_emailController.text.trim()}. Buka email dan klik link untuk mereset password.',
+                  'Jika email ${_emailController.text.trim()} terdaftar di SobatKuliah, link reset password telah dikirim. Buka email dan klik link untuk mereset password.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
                   textAlign: TextAlign.center,
                 )),
                 const SizedBox(height: 12),
                 Center(child: Text(
-                  'Cek juga folder Spam jika tidak ada di Inbox.',
+                  'Tidak menerima email? Pastikan email kamu sudah terdaftar (pernah Daftar akun). Cek juga folder Spam.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint),
                   textAlign: TextAlign.center,
                 )),
