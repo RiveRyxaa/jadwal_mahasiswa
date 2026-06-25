@@ -168,7 +168,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
             ],
 
             const SizedBox(height: 32),
-            Text('SobatKuliah v1.0.0', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
+            Text('SobatKuliah v1.0.4', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textHint)),
           ],
         ),
       ),
