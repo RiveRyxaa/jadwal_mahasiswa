@@ -17,7 +17,9 @@ class AuthProvider extends ChangeNotifier {
 
 
   final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: '308837170278-qg65aaev90bkgnbng9rj2g0rt09qiqbu.apps.googleusercontent.com',
+  );
 
 
   // ─── Auto Login ───

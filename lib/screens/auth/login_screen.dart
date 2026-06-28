@@ -243,68 +243,6 @@ class _LoginScreenState extends State<LoginScreen>
                               onPressed: _handleLogin,
                               isLoading: authProvider.isLoading,
                             ),
-                            const SizedBox(height: 24),
-
-                            // Divider
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Divider(
-                                    color: isDark
-                                        ? AppColors.darkBorder
-                                        : AppColors.divider,
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 16),
-                                  child: Text(
-                                    'ATAU LANJUTKAN DENGAN',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                          color: isDark
-                                              ? AppColors.darkTextSecondary
-                                              : AppColors.textSecondary,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 0.5,
-                                        ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Divider(
-                                    color: isDark
-                                        ? AppColors.darkBorder
-                                        : AppColors.divider,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-
-                            // Social Buttons
-                            SocialButton(
-                              text: 'Google',
-                              icon: Icons.g_mobiledata_rounded,
-                              onPressed: () async {
-                                final auth = context.read<AuthProvider>();
-                                final success = await auth.loginWithGoogle();
-                                if (success && context.mounted) {
-                                  Navigator.of(context).pushReplacementNamed('/home');
-                                } else if (context.mounted && auth.error != null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(auth.error!),
-                                      backgroundColor: AppColors.error,
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
                           ],
                         ),
                       ),
